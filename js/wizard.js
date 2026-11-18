@@ -199,9 +199,9 @@
     return {
       title: `${name} – Pakete in ${city.name}`,
       html: `
-      <div class="breadcrumb"><a href="#/s/${citySlug}">${esc(city.name)}</a> › <a href="#/s/${citySlug}/pakete">Pakete</a> › ${esc(name)}</div>
-      <div class="row" style="align-items:center;gap:14px"><div style="width:64px">${BC.ph(W.pkg.hue, W.pkg.icon)}</div>
-        <div><h1 style="margin:0">${esc(name)}</h1>${W.pkg.discountPercent ? `<span class="tag">−${W.pkg.discountPercent} % auf online gebuchte Leistungen</span>` : ""}</div></div>
+      ${BC.navBar(esc(name), `#/s/${citySlug}/pakete`)}
+      ${W.items.length ? BC.packageCover(W.pkg.items.length ? W.pkg : { hue: W.pkg.hue, items: W.items }) : ""}
+      <div class="studio-head"><h1>${esc(name)}</h1>${W.pkg.discountPercent ? `<div class="ri-sub">−${W.pkg.discountPercent} % auf online gebuchte Leistungen</div>` : ""}</div>
       <p class="muted" style="margin-top:10px">${esc(W.pkg.description)}</p>
       <nav class="wizard-steps" aria-label="Schritte">${STEPS.map((s, i) => {
         const n = i + 1;

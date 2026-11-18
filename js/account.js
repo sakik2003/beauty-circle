@@ -41,13 +41,15 @@
     const today = new Date(); today.setHours(0, 0, 0, 0);
     return {
       title: `Mein Konto – ${CFG.appName}`,
-      html: `<div class="row" style="gap:14px;margin-bottom:14px">${BC.avatar(CFG.demoUser.firstName)}<div><h1 style="margin:0">Hallo ${esc(CFG.demoUser.firstName)}</h1><span class="muted small">Demo-Konto · ${esc(BC.city(BC.currentCity()).name)}</span></div></div>
-      ${nav("konto")}
-      ${openManual ? `<div class="notice notice-manual" style="margin-bottom:14px"><span class="ic">${BC.icon("phone", 20)}</span><div>Du hast noch <strong>${openManual} ${openManual === 1 ? "Termin" : "Termine"}</strong>, die du selbst beim Studio vereinbaren musst. <a href="#/konto/pakete">Zur Checkliste →</a></div></div>` : ""}
-      <div class="grid grid-3">
-        <a class="card card-link" href="#/konto/pakete"><span class="stat">${S.userPackages.length}</span><div class="small muted">Pakete</div></a>
-        <a class="card card-link" href="#/konto/buchungen"><span class="stat">${upcoming}</span><div class="small muted">Kommende Termine</div></a>
-        <a class="card card-link" href="#/konto/merkliste"><span class="stat">${S.favorites.length}</span><div class="small muted">Gemerkte Studios</div></a>
+      html: `${BC.pageHead("Konto")}
+      <div class="group">
+        <div class="row-item">${BC.avatar(CFG.demoUser.firstName)}<span class="ri-body"><strong>${esc(CFG.demoUser.firstName)}</strong><span class="ri-sub">Demo-Konto · ${esc(BC.city(BC.currentCity()).name)}</span></span></div>
+      </div>
+      ${openManual ? `<a class="callout section" style="margin:16px 0 0" href="#/konto/pakete"><strong>${openManual} ${openManual === 1 ? "Termin" : "Termine"} noch selbst vereinbaren</strong><span>Zur Checkliste in „Meine Pakete“</span></a>` : ""}
+      <div class="group section">
+        <a class="row-item" href="#/konto/pakete"><span class="ri-icon" style="--tint:var(--pink-strong)">${BC.icon("bag", 18)}</span><span class="ri-body"><strong>Meine Pakete</strong></span><span class="ri-value">${S.userPackages.length}</span>${BC.chev()}</a>
+        <a class="row-item" href="#/konto/buchungen"><span class="ri-icon" style="--tint:var(--sky-strong)">${BC.icon("calendar", 18)}</span><span class="ri-body"><strong>Buchungen</strong></span><span class="ri-value">${upcoming}</span>${BC.chev()}</a>
+        <a class="row-item" href="#/konto/merkliste"><span class="ri-icon" style="--tint:var(--yellow-strong)">${BC.icon("heart", 18)}</span><span class="ri-body"><strong>Merkliste</strong></span><span class="ri-value">${S.favorites.length}</span>${BC.chev()}</a>
       </div>
 
       <section class="section card">
@@ -99,7 +101,7 @@
     const S = BC.S();
     return {
       title: `Meine Pakete – ${CFG.appName}`,
-      html: `${BC.pageHead("Meine Pakete")}${nav("pakete")}
+      html: `${BC.navBar("Meine Pakete", "#/konto")}
       ${S.userPackages.length ? `<div class="grid grid-2">${S.userPackages.map((up) => {
         const open = up.items.filter((i) => i.status === "manual_open").length;
         return `<a class="card card-link" href="#/konto/pakete/${up.id}"><div class="row" style="gap:12px;margin-bottom:10px"><div style="width:52px">${BC.ph(up.hue, up.icon)}</div>
@@ -136,8 +138,8 @@
     const items = up.items.map((it, idx) => ({ it, idx })).sort((a, b) => order[a.it.status] - order[b.it.status]);
     return {
       title: `${up.name} – Meine Pakete`,
-      html: `<div class="breadcrumb"><a href="#/konto/pakete">Meine Pakete</a> › ${esc(up.name)}</div>
-      <div class="row" style="gap:14px"><div style="width:60px">${BC.ph(up.hue, up.icon)}</div><div><h1 style="margin:0">${esc(up.name)}</h1><span class="small muted">${esc(BC.city(up.citySlug).name)} · erstellt am ${BC.fmtDate(up.createdAt)}</span></div></div>
+      html: `${BC.navBar(esc(up.name), "#/konto/pakete")}
+      <div class="studio-head" style="padding-top:4px"><h1>${esc(up.name)}</h1><div class="ri-sub">${esc(BC.city(up.citySlug).name)} · erstellt am ${BC.fmtDate(up.createdAt)}</div></div>
       <div class="card section">${progressBar(up)}${p.done === p.total ? `<p style="margin:10px 0 0"><strong>Alles erledigt. Viel Spaß bei deinen Terminen!</strong></p>` : ""}</div>
       ${overdue ? `<div class="notice notice-manual" role="alert" style="margin-bottom:14px"><span class="ic">${BC.icon("clock", 20)}</span><div><strong>Erinnerung:</strong> Du hast seit mehr als ${CFG.manualReminderHours} Stunden noch Termine offen, die du selbst vereinbaren musst.</div></div>` : ""}
       <div class="stack">${items.map(({ it, idx }) => row(it, idx)).join("")}</div>
@@ -175,7 +177,7 @@
     const STATUS = { confirmed: ["Bestätigt", "var(--ok)"], pending: ["Angefragt", "var(--req)"], cancelled: ["Storniert", "var(--muted)"] };
     return {
       title: `Meine Buchungen – ${CFG.appName}`,
-      html: `${BC.pageHead("Meine Buchungen")}${nav("buchungen")}
+      html: `${BC.navBar("Meine Buchungen", "#/konto")}
       ${list.length ? `<div class="stack">${list.map((b) => {
         const st = BC.studioById(b.studioId), v = BC.service(b.serviceId), s = STATUS[b.status];
         return `<div class="card"><div class="spread"><div><strong><a href="#/s/${st.citySlug}/studio/${st.slug}">${esc(st.name)}</a></strong><div class="small muted">${esc(v.name)} · ${BC.euro(v.price)}</div></div><strong style="color:${s[1]}">${s[0]}</strong></div>
@@ -200,8 +202,8 @@
     const favs = BC.S().favorites.map(BC.studioById).filter(Boolean);
     return {
       title: `Merkliste – ${CFG.appName}`,
-      html: `${BC.pageHead("Merkliste")}${nav("merkliste")}
-      ${favs.length ? `<div class="grid grid-2">${favs.map((s) => BC.studioCard(s)).join("")}</div>` : BC.empty("🤍", "Noch nichts gemerkt. Tippe auf das Herz bei einem Studio.", `<a class="btn btn-primary" href="#/s/${BC.currentCity()}">Studios entdecken</a>`)}`
+      html: `${BC.navBar("Merkliste", "#/konto")}
+      ${favs.length ? `${BC.studioList(favs)}` : BC.empty("🤍", "Noch nichts gemerkt. Tippe auf das Herz bei einem Studio.", `<a class="btn btn-primary" href="#/s/${BC.currentCity()}">Studios entdecken</a>`)}`
     };
   };
 })();

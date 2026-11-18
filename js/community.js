@@ -73,8 +73,7 @@
     const all = BC.allMessages();
     return {
       title: `Community ${city.name} – ${CFG.appName}`,
-      html: `<div class="breadcrumb"><a href="#/s/${citySlug}">${esc(city.name)}</a> › Community</div>
-      ${BC.pageHead("Community")}
+      html: `${BC.pageHead("Community", { eyebrow: esc(city.name) })}
       <p class="muted">Frag nach Empfehlungen, teile deine Erfahrungen und hilf anderen Frauen in ${esc(city.name)}. <a href="#/regeln">Regeln</a></p>
       <label class="sr-only" for="c-search">Fragen und Nachrichten durchsuchen</label>
       <input id="c-search" type="search" placeholder="🔎 Fragen & Empfehlungen durchsuchen, z. B. „Balayage“" data-input="community-search" data-city="${citySlug}" style="margin:6px 0 14px">
@@ -110,9 +109,9 @@
     const msgs = BC.allMessages().filter((m) => m.channelId === ch.id && !m.parentId).sort((a, b) => a.date - b.date);
     return {
       title: `#${ch.name} – Community ${city.name}`,
-      html: `<div class="breadcrumb"><a href="#/s/${citySlug}">${esc(city.name)}</a> › <a href="#/s/${citySlug}/community">Community</a> › #${esc(ch.name)}</div>
+      html: `${BC.navBar("#" + esc(ch.name), `#/s/${citySlug}/community`)}
       <div class="chips" style="margin-bottom:12px">${BC.channels(citySlug).map((c) => `<a class="chip ${c.id === ch.id ? "active" : ""}" href="#/s/${citySlug}/community/${c.slug}">${c.icon} ${esc(c.name)}</a>`).join("")}</div>
-      <h1>${ch.icon} #${esc(ch.name)}</h1><p class="muted small">${esc(ch.description)}</p>
+      <p class="footnote" style="margin:0 4px 12px">${esc(ch.description)}</p>
       <div class="card">${msgs.length ? msgs.map((m) => messageHtml(m, citySlug, ch)).join("") : `<p class="muted">Noch keine Beiträge – schreib den ersten! 💬</p>`}</div>
       ${composer(citySlug, ch)}`
     };
@@ -129,7 +128,7 @@
     const ordered = bestMsg ? [bestMsg].concat(replies.filter((r) => r.id !== best)) : replies;
     return {
       title: `${q.isQuestion ? "Frage" : "Beitrag"} von ${q.author} – #${ch.name}`,
-      html: `<div class="breadcrumb"><a href="#/s/${citySlug}/community">Community</a> › <a href="#/s/${citySlug}/community/${ch.slug}">#${esc(ch.name)}</a> › Thread</div>
+      html: `${BC.navBar(q.isQuestion ? "Frage" : "Beitrag", `#/s/${citySlug}/community/${ch.slug}`)}
       <div class="card">${messageHtml(q, citySlug, ch, { inThread: true })}</div>
       <h2 class="section" style="margin-bottom:10px">${replies.length} ${replies.length === 1 ? "Antwort" : "Antworten"}</h2>
       ${q.isQuestion ? `<p class="xs muted">Bei Fragen kann die hilfreichste Antwort markiert werden – sie erscheint dann ganz oben.</p>` : ""}

@@ -8,20 +8,19 @@
   const P = BC.pages;
   const CFG = BC.cfg;
 
-  // ---------- Startseite (Onboarding-Stil wie in der Vorlage)
+  // ---------- Startseite (Onboarding)
   const sparkle = (x, y, s) => `<path class="c-sand" transform="translate(${x} ${y}) scale(${s})" d="M0-14C1.5-3 3-1.5 14 0 3 1.5 1.5 3 0 14-1.5 3-3 1.5-14 0-3-1.5-1.5-3 0-14z"/>`;
   const illustration = () => `<svg class="illu" viewBox="0 0 320 290" role="img" aria-label="Illustration: Nagellack vor einem Herz">
       ${sparkle(34, 54, 1)}${sparkle(286, 36, .8)}${sparkle(26, 226, .7)}${sparkle(292, 214, 1)}
-      <circle class="c-lav" cx="160" cy="148" r="118"/>
+      <circle class="c-sky" cx="160" cy="148" r="118"/>
       <path class="c-pink" d="M160 262C70 205 38 150 52 108 66 66 120 52 160 98c40-46 94-32 108 10 14 42-18 97-108 154z"/>
       <rect class="c-white" x="226" y="80" width="14" height="44" rx="3"/><rect class="c-white" x="211" y="95" width="44" height="14" rx="3"/>
       <rect class="c-ink" x="134" y="58" width="52" height="64" rx="14"/>
       <rect class="c-ink" x="142" y="116" width="36" height="24" rx="4"/>
-      <rect class="c-sky" x="116" y="136" width="88" height="96" rx="20"/>
+      <rect class="c-lav" x="116" y="136" width="88" height="96" rx="20"/>
       <rect class="s-ink" x="116" y="136" width="88" height="96" rx="20"/>
       <rect class="c-white" x="131" y="152" width="13" height="42" rx="6.5"/>
       <circle class="c-white" cx="137" cy="206" r="5"/>
-      <path class="s-ink" d="M196 98c26-26 58-30 84-14"/><circle class="c-ink" cx="282" cy="86" r="6"/>
     </svg>`;
 
   P.home = () => {
@@ -33,43 +32,49 @@
       <section class="onboard">
         ${illustration()}
         <h1>Beauty, die immer nah ist</h1>
-        <p>Die besten Studios deiner Stadt, empfohlen von Frauen. Alles an einem Ort.</p>
+        <p>Die besten Studios deiner Stadt, empfohlen von Frauen.</p>
         <a class="btn btn-primary" href="#/s/${city}">Los geht's</a>
       </section>
-
       <section class="section">
-        ${BC.pageHead("Städte")}
-        <div class="stack">
-          ${BC.cities().map((c, i) => `<a class="studio-card card-link" style="--tint:${["var(--sky)", "var(--pink)", "var(--yellow)"][i % 3]};text-decoration:none" href="#/s/${c.slug}">
-              <span style="display:block;padding:14px 16px 12px"><h3 style="margin:0 0 2px;font-size:1.1rem">${esc(c.name)}</h3><span class="meta">${BC.studios(c.slug).length} Studios · ${(CFG.communitySize[c.slug] || 500).toLocaleString("de-DE")} Frauen</span></span>
-              <span class="foot"><span class="who"><span class="pic" aria-hidden="true">${BC.icon("pin", 22)}</span><span style="min-width:0"><strong>${S.citySlug === c.slug ? "Deine Stadt" : "Stadt wählen"}</strong><span>${BC.packages(c.slug).length} Pakete verfügbar</span></span></span>${BC.icon("arrow", 22)}</span>
-            </a>`).join("")}
-        </div>
+        <div class="section-head"><h2>Stadt wählen</h2></div>
+        <div class="group">${BC.cities().map((c, i) => `<a class="row-item" href="#/s/${c.slug}">
+          <span class="ri-icon" style="--tint:var(--${["sky", "pink", "yellow", "green"][i % 4]}-strong)">${BC.icon("pin", 18)}</span>
+          <span class="ri-body"><strong>${esc(c.name)}</strong><span class="ri-sub">${BC.studios(c.slug).length} Studios · ${(CFG.communitySize[c.slug] || 500).toLocaleString("de-DE")} Frauen</span></span>
+          ${S.citySlug === c.slug ? `<span class="ri-value">Deine Stadt</span>` : ""}${BC.chev()}</a>`).join("")}</div>
       </section>`
     };
   };
 
-  // ---------- Stadtseite (Aufbau wie "Appointments")
+  // ---------- Entdecken (Stadtseite)
+  const citySwitch = (citySlug) => `<select class="city-select" data-change="city-switch" aria-label="Stadt wechseln">${BC.cities().map((c) => `<option value="${c.slug}" ${c.slug === citySlug ? "selected" : ""}>${esc(c.name)}</option>`).join("")}</select>`;
   P.city = (citySlug) => {
     const city = BC.city(citySlug);
-    const cats = BC.categories();
-    const topCat = BC.ui.topCat;
-    const top = BC.studios(citySlug, { category: topCat || undefined }).slice(0, 5);
+    const all = BC.studios(citySlug);
+    const top = all.slice(0, 5);
+    const online = all.filter((s) => s.bookingMode === "online" && !top.includes(s)).slice(0, 4);
     return {
       title: `Beauty in ${city.name} – ${CFG.appName}`,
       html: `
-      ${BC.pageHead(esc(city.name), { search: `#/s/${citySlug}/k/alle`, plus: `#/s/${citySlug}/pakete/eigenes`, plusLabel: "Eigenes Paket erstellen" })}
-      <div class="slot-days" role="group" aria-label="Kategorie">
-        <button class="cat-chip ${!topCat ? "active" : ""}" aria-pressed="${!topCat}" data-act="top-cat" data-cat=""><span class="lbl">Top 5</span><span class="val">Alle</span></button>
-        ${cats.map((c) => `<button class="cat-chip ${topCat === c.slug ? "active" : ""}" aria-pressed="${topCat === c.slug}" data-act="top-cat" data-cat="${c.slug}"><span class="lbl">${BC.studios(citySlug, { category: c.slug }).length} Studios</span><span class="val">${esc(c.name.split(" ")[0])}</span></button>`).join("")}
-      </div>
-      <div class="stack" style="margin-top:14px">${top.map((s, i) => BC.studioCard(s, { rank: i + 1 })).join("")}</div>
-      ${topCat ? `<a class="btn btn-block" style="margin-top:12px" href="#/s/${citySlug}/k/${topCat}">Alle ${esc(BC.category(topCat).name)}-Studios</a>` : ""}`
+      ${BC.pageHead("Entdecken", { eyebrow: `${all.length} Studios in ${esc(city.name)}`, trailing: citySwitch(citySlug) })}
+      <a class="search-field" href="#/s/${citySlug}/k/alle">${BC.icon("search", 18)} Studios suchen</a>
+
+      <section class="section" style="margin-top:22px">
+        <div class="cat-scroll">${BC.categories().map((c) => `<a class="cat-item" href="#/s/${citySlug}/k/${c.slug}">${BC.ph(c.hue, c.icon)}<span>${esc(c.name.split(" ")[0])}</span></a>`).join("")}</div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Beliebt in ${esc(city.name)}</h2><a href="#/s/${citySlug}/k/alle">Alle</a></div>
+        <div class="tiles">${top.map(BC.studioTile).join("")}</div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Sofort online buchbar</h2></div>
+        ${BC.studioList(online)}
+      </section>`
     };
   };
-  BC.actions["top-cat"] = (el) => { BC.ui.topCat = el.dataset.cat; BC.render(); };
 
-  // ---------- Studioliste einer Kategorie
+  // ---------- Studioliste
   P.category = (citySlug, catSlug) => {
     const city = BC.city(citySlug);
     const cat = catSlug === "alle" ? { slug: "alle", name: "Alle Studios" } : BC.category(catSlug);
@@ -81,29 +86,27 @@
     const list = BC.studios(citySlug, Object.assign({}, f, { category: catF }));
     const districts = [...new Set(all.map((s) => s.district))].sort();
     const langs = [...new Set(all.flatMap((s) => s.languages))].sort();
-    const sel = (name, label, options) => `<label class="field"><span class="xs">${label}</span><select data-change="filter" data-key="${fkey}" data-name="${name}">
+    const sel = (name, label, options) => `<label class="field"><span>${label}</span><select data-change="filter" data-key="${fkey}" data-name="${name}">
       ${options.map(([v, t]) => `<option value="${esc(v)}" ${String(f[name] || "") === String(v) ? "selected" : ""}>${esc(t)}</option>`).join("")}</select></label>`;
     return {
       title: `${cat.name} in ${city.name} – ${CFG.appName}`,
       html: `
-      <div class="breadcrumb"><a href="#/s/${citySlug}">${esc(city.name)}</a> › ${esc(cat.name)}</div>
-      ${BC.pageHead(esc(cat.name))}
-      <div class="chips" role="group" aria-label="Buchungsart" style="margin-top:14px">
-        ${[["", "Alle"], ["online", "Online buchbar"], ["request", "Anfrage"], ["manual", "Nur manuell"]].map(([v, t]) =>
+      ${BC.navBar(esc(cat.name), `#/s/${citySlug}`)}
+      <div class="chips" role="group" aria-label="Buchungsart">
+        ${[["", "Alle"], ["online", "Online"], ["request", "Anfrage"], ["manual", "Direkt"]].map(([v, t]) =>
           `<button class="chip ${String(f.mode || "") === v ? "active" : ""}" aria-pressed="${String(f.mode || "") === v}" data-act="filter-mode" data-key="${fkey}" data-mode="${v}">${t}</button>`).join("")}
       </div>
-      <details class="collapse" style="margin:10px 0 4px" ${["district", "price", "language", "minRating"].some((k) => f[k]) ? "open" : ""}><summary>Weitere Filter</summary>
+      <details class="disclosure" ${["district", "price", "language"].some((k) => f[k]) ? "open" : ""}><summary>Filter & Sortierung</summary>
         <div class="filters" style="margin-top:8px">
-          ${sel("district", "Bezirk", [["", "Alle Bezirke"], ...districts.map((d) => [d, d])])}
-          ${sel("price", "Preis", [["", "Alle"], ["1", "€ günstig"], ["2", "€€ mittel"], ["3", "€€€ gehoben"]])}
+          ${sel("district", "Bezirk", [["", "Alle"], ...districts.map((d) => [d, d])])}
+          ${sel("price", "Preis", [["", "Alle"], ["1", "€"], ["2", "€€"], ["3", "€€€"]])}
           ${sel("language", "Sprache", [["", "Alle"], ...langs.map((l) => [l, l])])}
-          ${sel("minRating", "Bewertung", [["", "Alle"], ["4.5", "ab 4,5"], ["4.7", "ab 4,7"]])}
-          ${sel("sort", "Sortieren", [["score", "Beliebteste"], ["online", "Online buchbar zuerst"], ["price", "Günstigste"], ["reviews", "Meiste Bewertungen"]])}
+          ${sel("sort", "Sortieren", [["score", "Beliebteste"], ["online", "Online zuerst"], ["price", "Günstigste"], ["reviews", "Meiste Bewertungen"]])}
         </div>
       </details>
-      <div class="spread" style="margin:6px 0 12px"><span class="muted small">${list.length} ${list.length === 1 ? "Studio" : "Studios"} in ${esc(city.name)}</span>
+      <div class="spread" style="margin:14px 4px 8px"><span class="footnote" style="margin:0">${list.length} ${list.length === 1 ? "Studio" : "Studios"}</span>
         ${Object.values(f).some(Boolean) ? `<button class="link-btn" data-act="filter-reset" data-key="${fkey}">Zurücksetzen</button>` : ""}</div>
-      ${list.length ? `<div class="stack">${list.map((s) => BC.studioCard(s)).join("")}</div>` : BC.empty("", "Keine Studios mit diesen Filtern.", `<button class="btn" data-act="filter-reset" data-key="${fkey}">Filter zurücksetzen</button>`)}`
+      ${list.length ? BC.studioList(list) : BC.empty("", "Keine Studios mit diesen Filtern.", `<button class="btn btn-secondary" data-act="filter-reset" data-key="${fkey}">Filter zurücksetzen</button>`)}`
     };
   };
   BC.changes.filter = (el) => { BC.ui.filters[el.dataset.key][el.dataset.name] = el.value; BC.render(); };
@@ -120,72 +123,77 @@
     const single = BC.ui.single;
     const reviews = BC.reviewsOf(st.id);
     const r = BC.ratingOf(st);
-    const serviceSelect = `<label class="field"><span>Leistung</span><select data-change="single-service">${services.map((v) => `<option value="${v.id}" ${v.id === single.serviceId ? "selected" : ""}>${esc(v.name)} – ${BC.euro(v.price)}</option>`).join("")}</select></label>`;
+    const os = BC.openState(st);
+    const serviceSelect = `<label class="field"><span>Leistung</span><select data-change="single-service">${services.map((v) => `<option value="${v.id}" ${v.id === single.serviceId ? "selected" : ""}>${esc(v.name)} · ${BC.euro(v.price)}</option>`).join("")}</select></label>`;
     const service = BC.service(single.serviceId);
 
     let booking = "";
     if (st.bookingMode === "online") {
-      booking = `<h2>Termin buchen</h2>${BC.modeBadge("online")}<div class="stack" style="margin-top:12px">${serviceSelect}
-        ${BC.slotPicker(st, "single", "single-slot", single.slotId)}
-        <button class="btn btn-primary btn-block" data-act="single-book" ${single.slotId ? "" : "disabled"}>${single.slotId ? `Verbindlich buchen: ${BC.fmtDateTime(single.start)}` : "Bitte Uhrzeit wählen"}</button></div>
-        <details class="collapse" style="margin-top:12px"><summary>Lieber direkt Kontakt aufnehmen?</summary>${BC.contactCard(st, { service: service.name, hideHead: true, key: "single-c" })}</details>`;
+      booking = `<div class="spread" style="margin-bottom:14px"><h2 style="margin:0">Termin buchen</h2>${BC.modeBadge("online")}</div>
+        <div class="stack">${serviceSelect}${BC.slotPicker(st, "single", "single-slot", single.slotId)}
+        <button class="btn btn-primary btn-block" data-act="single-book" ${single.slotId ? "" : "disabled"}>${single.slotId ? `Buchen · ${BC.fmtDateTime(single.start)}` : "Uhrzeit wählen"}</button></div>`;
     } else if (st.bookingMode === "request") {
       const min = BC.toLocalInput(Date.now() + 3600000);
-      booking = `<h2>Termin anfragen</h2>${BC.modeBadge("request")}
-        <p class="small muted" style="margin-top:8px">Sende bis zu 3 Wunschtermine – das Studio bestätigt einen davon.</p>
+      booking = `<div class="spread" style="margin-bottom:6px"><h2 style="margin:0">Termin anfragen</h2>${BC.modeBadge("request")}</div>
+        <p class="footnote" style="margin:0 0 14px">Bis zu drei Wunschtermine – das Studio bestätigt einen.</p>
         <form data-submit="single-request" class="stack">${serviceSelect}
-          ${[1, 2, 3].map((n) => `<label class="field"><span>Wunschtermin ${n}${n === 1 ? " *" : " (optional)"}</span><input type="datetime-local" name="t${n}" min="${min}" step="1800" ${n === 1 ? "required" : ""}></label>`).join("")}
+          ${[1, 2, 3].map((n) => `<label class="field"><span>Wunschtermin ${n}${n === 1 ? "" : " (optional)"}</span><input type="datetime-local" name="t${n}" min="${min}" step="1800" ${n === 1 ? "required" : ""}></label>`).join("")}
           <button class="btn btn-primary btn-block" type="submit">Anfrage senden</button>
-        </form>
-        <details class="collapse" style="margin-top:12px"><summary>Lieber direkt Kontakt aufnehmen?</summary>${BC.contactCard(st, { service: service.name, hideHead: true, key: "single-c" })}</details>`;
+        </form>`;
     } else {
-      booking = `<h2>Termin vereinbaren</h2>${serviceSelect}<div style="margin-top:12px">${BC.contactCard(st, { service: service.name, hideHead: true, key: "single-c" })}</div>`;
+      booking = `<h2>Termin vereinbaren</h2><div class="stack">${serviceSelect}${BC.contactCard(st, { service: service.name, hideHead: true, key: "single-c" })}</div>`;
     }
 
     const myReviewForm = `<form class="stack" data-submit="review" data-studio="${st.id}" style="margin-top:10px">
-      ${BC.hasBookedWith(st.id) ? `<p class="small verified">✓ Deine Bewertung wird als „verifiziert“ markiert, weil du hier gebucht hast.</p>` : `<p class="xs muted">Tipp: Nach einer Buchung über ${esc(CFG.appName)} wird deine Bewertung als „verifiziert“ markiert.</p>`}
-      <fieldset style="border:none;padding:0;margin:0"><legend class="small" style="font-weight:600">Sterne *</legend>
+      ${BC.hasBookedWith(st.id) ? `<p class="small verified">Deine Bewertung wird als „verifiziert“ markiert.</p>` : ""}
+      <fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Sterne</legend>
         <div class="star-input">${[5, 4, 3, 2, 1].map((n) => `<input type="radio" id="st-${n}" name="rating" value="${n}" ${n === 5 ? "required" : ""}><label for="st-${n}" title="${n} Sterne">★</label>`).join("")}</div></fieldset>
       <label class="field"><span>Leistung</span><select name="service">${services.map((v) => `<option value="${v.categorySlug}">${esc(v.name)}</option>`).join("")}</select></label>
-      <label class="field"><span>Deine Erfahrung *</span><textarea name="text" required minlength="10" maxlength="800" placeholder="Wie war das Ergebnis, die Beratung, die Atmosphäre?"></textarea></label>
-      <label class="field"><span>Fotos (Vorher/Nachher, max. 4)</span><input type="file" name="photos" accept="image/*" multiple></label>
-      <button class="btn btn-primary" type="submit">Bewertung veröffentlichen</button>
+      <label class="field"><span>Deine Erfahrung</span><textarea name="text" required minlength="10" maxlength="800" placeholder="Wie war das Ergebnis?"></textarea></label>
+      <label class="field"><span>Fotos (max. 4)</span><input type="file" name="photos" accept="image/*" multiple></label>
+      <button class="btn btn-primary" type="submit">Veröffentlichen</button>
     </form>`;
 
     return {
       title: `${st.name} – ${BC.category(st.categories[0]).name} in ${city.name}`,
       html: `
-      <div class="breadcrumb"><a href="#/s/${citySlug}">${esc(city.name)}</a> › <a href="#/s/${citySlug}/k/${st.categories[0]}">${esc(BC.category(st.categories[0]).name)}</a> › ${esc(st.name)}</div>
-      <div class="studio-hero" style="--tint:${BC.tint(st.hue)}">
-        <div class="spread" style="align-items:flex-start;flex-wrap:nowrap">
-          <div style="min-width:0">
-            <h1>${esc(st.name)}</h1>
-            <div class="small" style="opacity:.75">${esc(st.district)} · ${st.categories.map((c) => esc(BC.category(c).name)).join(" · ")}</div>
-          </div>
-          <button class="fav-btn" style="position:static" data-act="fav" data-id="${st.id}" aria-pressed="${BC.isFav(st.id)}" aria-label="${BC.isFav(st.id) ? "Von Merkliste entfernen" : "Merken"}">${BC.icon("heart", 18)}</button>
-        </div>
-        <div class="row" style="margin-top:14px">${BC.ratingHtml(st)}${BC.priceLevel(st.priceLevel)}${BC.modeBadge(st.bookingMode)}</div>
+      ${BC.navBar("", `#/s/${citySlug}/k/${st.categories[0]}`, BC.favBtn(st))}
+      ${BC.cover(st)}
+      <div class="studio-head">
+        <h1>${esc(st.name)}</h1>
+        <div class="ri-sub">${st.categories.map((c) => esc(BC.category(c).name)).join(" · ")} · ${esc(st.district)}</div>
+      </div>
+      <div class="info-boxes">
+        <div class="info-box"><span>Bewertung</span><strong>★ ${r.rating.toFixed(1).replace(".", ",")}</strong></div>
+        <div class="info-box"><span>Preise ab</span><strong>${BC.euro(BC.fromPrice(st))}</strong></div>
+        <div class="info-box"><span>Heute</span><strong class="open-state ${os.open ? "is-open" : "is-closed"}">${os.open ? "Offen" : "Zu"}</strong></div>
       </div>
 
-      <div class="stack section">
-        <div class="card" id="booking">${booking}</div>
-        <div class="card"><h2>Leistungen</h2>${services.map((v) => `<div class="service-row"><div><strong>${esc(v.name)}</strong><div class="xs muted">ca. ${v.durationMin} Min.</div></div><strong>${BC.euro(v.price)}</strong></div>`).join("")}</div>
-        <div class="card"><h2>Über das Studio</h2><p>${esc(st.description)}</p><p class="small muted" style="margin:0">Sprachen: ${st.languages.map(esc).join(", ")}</p></div>
-        <div class="card"><h2>Öffnungszeiten & Adresse</h2>
-          <p class="open-state ${BC.openState(st).open ? "is-open" : "is-closed"}">${BC.icon("clock", 14)} ${BC.openState(st).text}</p>${BC.hoursTable(st)}
-          <hr><p style="margin-bottom:10px">${esc(st.address)}, ${esc(city.name)}</p>
-          <div class="row">
-            <a class="btn btn-sm" href="https://www.openstreetmap.org/?mlat=${st.lat}&mlon=${st.lng}#map=16/${st.lat}/${st.lng}" target="_blank" rel="noopener">${BC.icon("pin", 16)} Karte</a>
-            <a class="btn btn-sm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(st.address + ", " + city.name)}" target="_blank" rel="noopener">Route planen</a>
-          </div></div>
-        <div class="card" id="reviews"><div class="spread"><h2 style="margin:0">Bewertungen</h2>${BC.ratingHtml(st)}</div>
-          ${reviews.map((rv) => `<div class="review"><div class="row">${BC.avatar(rv.author)}<div style="flex:1;min-width:0"><strong>${esc(rv.author)}</strong> ${rv.verified ? `<span class="verified">${BC.icon("check", 12)} Verifiziert</span>` : ""}<div class="xs muted">${BC.ago(rv.date)} · ${esc(BC.category(rv.categorySlug).name)}</div></div><span class="rating">${BC.icon("star", 14, true)}${rv.rating}</span></div>
-            <p style="margin:8px 0 0">${esc(rv.text)}</p>
-            ${rv.images && rv.images.length ? `<div class="row" style="margin-top:8px">${rv.images.map((src) => `<img src="${esc(src)}" alt="Foto von ${esc(rv.author)}" style="height:80px;width:80px;object-fit:cover;border-radius:12px">`).join("")}</div>` : ""}
+      <div class="card" id="booking">${booking}</div>
+
+      <section class="section">
+        <div class="section-head"><h2>Leistungen</h2></div>
+        <div class="group">${services.map((v) => `<div class="service-row"><div><div>${esc(v.name)}</div><div class="xs">ca. ${v.durationMin} Min.</div></div><span style="font-weight:500">${BC.euro(v.price)}</span></div>`).join("")}</div>
+      </section>
+
+      ${st.bookingMode !== "manual" ? `<section class="section"><div class="section-head"><h2>Kontakt</h2></div>${BC.contactCard(st, { service: service.name, hideHead: true, key: "single-c", notice: false })}</section>` : ""}
+
+      <section class="section">
+        <div class="section-head"><h2>Öffnungszeiten</h2></div>
+        <div class="card" style="padding:6px 16px">${BC.hoursTable(st)}</div>
+        <p class="footnote">${esc(st.address)}, ${esc(city.name)} · Sprachen: ${st.languages.map(esc).join(", ")}</p>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Bewertungen</h2><span class="rating">${BC.icon("star", 14, true)}${r.rating.toFixed(1).replace(".", ",")} <span class="muted">(${r.count})</span></span></div>
+        <div class="group">
+          ${reviews.slice(0, 4).map((rv) => `<div class="review"><div class="row" style="flex-wrap:nowrap">${BC.avatar(rv.author)}<div style="flex:1;min-width:0"><strong style="font-weight:500">${esc(rv.author)}</strong>${rv.verified ? ` <span class="verified">${BC.icon("check", 12)} verifiziert</span>` : ""}<div class="xs">${BC.ago(rv.date)}</div></div><span class="rating">${BC.icon("star", 13, true)}${rv.rating}</span></div>
+            <p>${esc(rv.text)}</p>
+            ${rv.images && rv.images.length ? `<div class="row" style="margin-top:8px">${rv.images.map((src) => `<img src="${esc(src)}" alt="Foto von ${esc(rv.author)}" style="height:72px;width:72px;object-fit:cover;border-radius:12px">`).join("")}</div>` : ""}
           </div>`).join("")}
-          <details class="collapse" style="margin-top:10px"><summary>Bewertung schreiben</summary>${myReviewForm}</details>
         </div>
-      </div>`
+        <div class="card" style="margin-top:12px;padding:6px 16px 14px"><details class="disclosure"><summary>Bewertung schreiben</summary>${myReviewForm}</details></div>
+      </section>`
     };
   };
   BC.changes["single-service"] = (el) => {
@@ -258,14 +266,12 @@
     return {
       title: `Pakete in ${city.name} – ${CFG.appName}`,
       html: `
-      <div class="breadcrumb"><a href="#/s/${citySlug}">${esc(city.name)}</a> › Pakete</div>
-      ${BC.pageHead("Pakete", { plus: `#/s/${citySlug}/pakete/eigenes`, plusLabel: "Eigenes Paket erstellen" })}
+      ${BC.pageHead("Pakete", { eyebrow: esc(city.name), plus: `#/s/${citySlug}/pakete/eigenes`, plusLabel: "Eigenes Paket erstellen" })}
       <p class="page-sub">Paket wählen, Studio pro Leistung aussuchen, fertig.</p>
-      <div class="grid grid-3 section">
-        ${BC.packages(citySlug).map((p) => BC.packageCard(p, citySlug)).join("")}
-        <a class="pkg-card card-link" style="--tint:var(--surface)" href="#/s/${citySlug}/pakete/eigenes">
-          <span class="pkg-icon" aria-hidden="true">${BC.icon("plus", 26)}</span><h3>Eigenes Paket</h3>
-          <span class="items">Deine Wunsch-Kombination</span><span class="go"><span></span>${BC.icon("arrow", 20)}</span></a>
+      <div class="grid grid-2">${BC.packages(citySlug).map((p) => BC.packageCard(p, citySlug)).join("")}</div>
+      <div class="group section">
+        <a class="row-item" href="#/s/${citySlug}/pakete/eigenes"><span class="ri-icon" style="--tint:var(--fill-strong)">${BC.icon("plus", 18)}</span>
+          <span class="ri-body"><strong>Eigenes Paket</strong><span class="ri-sub">Leistungen frei kombinieren</span></span>${BC.chev()}</a>
       </div>`
     };
   };
