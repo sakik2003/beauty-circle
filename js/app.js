@@ -56,7 +56,7 @@
     const cur = (k) => (isActive(k) ? 'class="active" aria-current="page"' : "");
     document.getElementById("top-nav").innerHTML = items.map(([k, t, , h]) => `<a href="${h}" ${cur(k)}>${t}</a>`).join("");
     document.getElementById("bottom-nav").innerHTML = items.map(([k, t, ic, h]) =>
-      `<a href="${h}" ${cur(k)}>${BC.icon(ic, 24)}${t}${k === "konto" && open ? `<span class="dot" aria-label="${open} offen">${open}</span>` : ""}</a>`).join("");
+      `<a href="${h}" ${cur(k)}>${BC.icon(ic, 26)}<span class="lbl">${t}</span>${k === "konto" && open ? `<span class="dot" aria-label="${open} offen">${open}</span>` : ""}</a>`).join("");
     const sel = document.getElementById("city-switch");
     sel.innerHTML = BC.cities().map((c) => `<option value="${c.slug}" ${c.slug === city ? "selected" : ""}>${BC.esc(c.name)}</option>`).join("");
     document.getElementById("logo").innerHTML = `<span class="mark" aria-hidden="true"></span>${BC.esc(CFG.appName)}`;

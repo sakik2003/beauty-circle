@@ -99,7 +99,7 @@
     const S = BC.S();
     return {
       title: `Meine Pakete – ${CFG.appName}`,
-      html: `<h1>Meine Pakete</h1>${nav("pakete")}
+      html: `${BC.pageHead("Meine Pakete")}${nav("pakete")}
       ${S.userPackages.length ? `<div class="grid grid-2">${S.userPackages.map((up) => {
         const open = up.items.filter((i) => i.status === "manual_open").length;
         return `<a class="card card-link" href="#/konto/pakete/${up.id}"><div class="row" style="gap:12px;margin-bottom:10px"><div style="width:52px">${BC.ph(up.hue, up.icon)}</div>
@@ -175,7 +175,7 @@
     const STATUS = { confirmed: ["Bestätigt", "var(--ok)"], pending: ["Angefragt", "var(--req)"], cancelled: ["Storniert", "var(--muted)"] };
     return {
       title: `Meine Buchungen – ${CFG.appName}`,
-      html: `<h1>Meine Buchungen</h1>${nav("buchungen")}
+      html: `${BC.pageHead("Meine Buchungen")}${nav("buchungen")}
       ${list.length ? `<div class="stack">${list.map((b) => {
         const st = BC.studioById(b.studioId), v = BC.service(b.serviceId), s = STATUS[b.status];
         return `<div class="card"><div class="spread"><div><strong><a href="#/s/${st.citySlug}/studio/${st.slug}">${esc(st.name)}</a></strong><div class="small muted">${esc(v.name)} · ${BC.euro(v.price)}</div></div><strong style="color:${s[1]}">${s[0]}</strong></div>
@@ -200,7 +200,7 @@
     const favs = BC.S().favorites.map(BC.studioById).filter(Boolean);
     return {
       title: `Merkliste – ${CFG.appName}`,
-      html: `<h1>Merkliste</h1>${nav("merkliste")}
+      html: `${BC.pageHead("Merkliste")}${nav("merkliste")}
       ${favs.length ? `<div class="grid grid-2">${favs.map((s) => BC.studioCard(s)).join("")}</div>` : BC.empty("🤍", "Noch nichts gemerkt. Tippe auf das Herz bei einem Studio.", `<a class="btn btn-primary" href="#/s/${BC.currentCity()}">Studios entdecken</a>`)}`
     };
   };

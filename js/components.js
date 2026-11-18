@@ -63,17 +63,31 @@
   BC.favBtn = (st) => `<button class="fav-btn" data-act="fav" data-id="${st.id}" aria-pressed="${BC.isFav(st.id)}" aria-label="${BC.isFav(st.id) ? "Von Merkliste entfernen" : "Merken"}">${BC.icon("heart", 18)}</button>`;
 
   // ---------- Studio-Karte (flächig in Pastell, wie die Terminkarten)
+  // Aufbau wie die Terminkarten der Vorlage: Titel, Zeile darunter, Trennlinie, Bild + Name
   BC.studioCard = (st, opts) => {
     opts = opts || {};
-    const cats = st.categories.map((c) => BC.category(c).name).join(" · ");
+    const cat = BC.category(st.categories[0]);
+    const from = Math.min(...BC.servicesOf(st.id).map((v) => v.price));
+    const r = BC.ratingOf(st);
     return `<article class="studio-card" style="--tint:${BC.tint(st.hue)}">
       <a href="#/s/${st.citySlug}/studio/${st.slug}">
         <h3>${opts.rank ? `<span class="rank">${opts.rank}</span>` : ""}${esc(st.name)}</h3>
-        <div class="meta">${esc(st.district)} · ${esc(cats)}</div>
+        <div class="meta">${esc(st.categories.map((c) => BC.category(c).name).join(", "))} · ab ${BC.euro(from)}</div>
       </a>
-      <div class="foot">${BC.ratingHtml(st)}${BC.priceLevel(st.priceLevel)}<span style="margin-left:auto">${BC.modeBadge(st.bookingMode)}</span></div>
+      <div class="foot">
+        <div class="who"><span class="pic" aria-hidden="true">${cat.icon}</span><div style="min-width:0"><strong>${esc(st.district)}</strong><span>★ ${r.rating.toFixed(1).replace(".", ",")} (${r.count})</span></div></div>
+        ${BC.modeBadge(st.bookingMode)}
+      </div>
       ${BC.favBtn(st)}
     </article>`;
+  };
+
+  // Seitenkopf wie "Appointments": Titel, Lupe, schwarzer Plus-Button
+  BC.pageHead = (title, opts) => {
+    opts = opts || {};
+    return `<div class="page-head"><h1>${title}</h1>
+      ${opts.search ? `<a class="round-btn" href="${opts.search}" aria-label="Suchen">${BC.icon("search", 24)}</a>` : ""}
+      ${opts.plus ? `<a class="square-btn" href="${opts.plus}" aria-label="${esc(opts.plusLabel || "Neu")}">${BC.icon("plus", 24)}</a>` : ""}</div>`;
   };
 
   // ---------- Paket-Karte

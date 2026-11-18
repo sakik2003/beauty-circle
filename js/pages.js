@@ -8,16 +8,21 @@
   const P = BC.pages;
   const CFG = BC.cfg;
 
-  // ---------- Startseite
-  // Kleiner "Sticker" wie im Vorbild: gewellter Kreis mit Herz
-  const sticker = () => {
-    const petals = Array.from({ length: 14 }, (_, i) => {
-      const a = (i / 14) * Math.PI * 2;
-      return `<circle class="petal" cx="${(60 + Math.cos(a) * 44).toFixed(1)}" cy="${(60 + Math.sin(a) * 44).toFixed(1)}" r="14"/>`;
-    }).join("");
-    return `<svg class="sticker" viewBox="0 0 120 120" aria-hidden="true">${petals}<circle class="petal" cx="60" cy="60" r="46"/>
-      <path class="heart" d="M60 76s-16-9.6-16-20.4A8.6 8.6 0 0 1 60 51a8.6 8.6 0 0 1 16 4.6C76 66.4 60 76 60 76z"/></svg>`;
-  };
+  // ---------- Startseite (Onboarding-Stil wie in der Vorlage)
+  const sparkle = (x, y, s) => `<path class="c-sand" transform="translate(${x} ${y}) scale(${s})" d="M0-14C1.5-3 3-1.5 14 0 3 1.5 1.5 3 0 14-1.5 3-3 1.5-14 0-3-1.5-1.5-3 0-14z"/>`;
+  const illustration = () => `<svg class="illu" viewBox="0 0 320 290" role="img" aria-label="Illustration: Nagellack vor einem Herz">
+      ${sparkle(34, 54, 1)}${sparkle(286, 36, .8)}${sparkle(26, 226, .7)}${sparkle(292, 214, 1)}
+      <circle class="c-lav" cx="160" cy="148" r="118"/>
+      <path class="c-pink" d="M160 262C70 205 38 150 52 108 66 66 120 52 160 98c40-46 94-32 108 10 14 42-18 97-108 154z"/>
+      <rect class="c-white" x="226" y="80" width="14" height="44" rx="3"/><rect class="c-white" x="211" y="95" width="44" height="14" rx="3"/>
+      <rect class="c-ink" x="134" y="58" width="52" height="64" rx="14"/>
+      <rect class="c-ink" x="142" y="116" width="36" height="24" rx="4"/>
+      <rect class="c-sky" x="116" y="136" width="88" height="96" rx="20"/>
+      <rect class="s-ink" x="116" y="136" width="88" height="96" rx="20"/>
+      <rect class="c-white" x="131" y="152" width="13" height="42" rx="6.5"/>
+      <circle class="c-white" cx="137" cy="206" r="5"/>
+      <path class="s-ink" d="M196 98c26-26 58-30 84-14"/><circle class="c-ink" cx="282" cy="86" r="6"/>
+    </svg>`;
 
   P.home = () => {
     const city = BC.currentCity();
@@ -25,18 +30,19 @@
     return {
       title: `${CFG.appName} – Beauty-Empfehlungen von Frauen für Frauen`,
       html: `
-      <section class="hero">
-        ${sticker()}
-        <h1>Die <b>besten</b> Beauty-Adressen deiner <b>Stadt.</b></h1>
-        <p>Empfohlen von Frauen für Frauen. Finden, austauschen und ganze Pakete buchen.</p>
+      <section class="onboard">
+        ${illustration()}
+        <h1>Beauty, die immer nah ist</h1>
+        <p>Die besten Studios deiner Stadt, empfohlen von Frauen. Alles an einem Ort.</p>
+        <a class="btn btn-primary" href="#/s/${city}">Los geht's</a>
       </section>
 
       <section class="section">
-        <div class="section-head"><h2>Wähle deine Stadt</h2></div>
-        <div class="grid grid-2">
-          ${BC.cities().map((c, i) => `<a class="city-card card-link" style="--tint:${["var(--pink)", "var(--sky)", "var(--lav)", "var(--sand)"][i % 4]}" href="#/s/${c.slug}">
-              <div><h3>${esc(c.name)}</h3><span class="small" style="opacity:.75">${BC.studios(c.slug).length} Studios · ${(CFG.communitySize[c.slug] || 500).toLocaleString("de-DE")} Frauen</span></div>
-              ${S.citySlug === c.slug ? `<span class="tag">Deine Stadt</span>` : BC.icon("arrow", 22)}
+        ${BC.pageHead("Städte")}
+        <div class="stack">
+          ${BC.cities().map((c, i) => `<a class="studio-card card-link" style="--tint:${["var(--sky)", "var(--pink)", "var(--lav)"][i % 3]};text-decoration:none" href="#/s/${c.slug}">
+              <span style="display:block;padding:14px 16px 12px"><h3 style="margin:0 0 2px;font-size:1.1rem">${esc(c.name)}</h3><span class="meta">${BC.studios(c.slug).length} Studios · ${(CFG.communitySize[c.slug] || 500).toLocaleString("de-DE")} Frauen</span></span>
+              <span class="foot"><span class="who"><span class="pic" aria-hidden="true">${BC.icon("pin", 22)}</span><span style="min-width:0"><strong>${S.citySlug === c.slug ? "Deine Stadt" : "Stadt wählen"}</strong><span>${BC.packages(c.slug).length} Pakete verfügbar</span></span></span>${BC.icon("arrow", 22)}</span>
             </a>`).join("")}
         </div>
       </section>
@@ -44,20 +50,11 @@
       <section class="section">
         <div class="section-head"><h2>Beliebte Pakete</h2><a href="#/s/${city}/pakete">Alle</a></div>
         <div class="grid grid-3">${BC.packages(city).filter((p) => p.popular).map((p) => BC.packageCard(p, city)).join("")}</div>
-      </section>
-
-      <section class="section card">
-        <h2>So wird gebucht</h2>
-        <div class="legend" style="margin-top:12px">
-          <div class="item">${BC.modeBadge("online")}<span class="small muted">Termin wählen, sofort fest.</span></div>
-          <div class="item">${BC.modeBadge("request")}<span class="small muted">Wunschtermin senden, Studio bestätigt.</span></div>
-          <div class="item">${BC.modeBadge("manual")}<span class="small muted">Du bekommst Kontaktdaten und eine fertige Nachricht.</span></div>
-        </div>
       </section>`
     };
   };
 
-  // ---------- Stadtseite
+  // ---------- Stadtseite (Aufbau wie "Appointments")
   P.city = (citySlug) => {
     const city = BC.city(citySlug);
     const cats = BC.categories();
@@ -66,23 +63,13 @@
     return {
       title: `Beauty in ${city.name} – ${CFG.appName}`,
       html: `
-      <section class="hero" style="padding-bottom:0">
-        <h1>Beauty in <b>${esc(city.name)}</b></h1>
-        <p>${BC.studios(citySlug).length} ausgewählte Studios, empfohlen von ${(CFG.communitySize[citySlug] || 500).toLocaleString("de-DE")} Frauen.</p>
-      </section>
-
-      <section class="section">
-        <div class="grid grid-cats">${cats.map((c) => `<a class="cat-tile" href="#/s/${citySlug}/k/${c.slug}">${BC.ph(c.hue, c.icon)}<strong>${esc(c.name)}</strong></a>`).join("")}</div>
-      </section>
-
-      <section class="section">
-        <div class="section-head"><h2>Top 5</h2><span class="xs muted">Nach Bewertungen, nicht käuflich</span></div>
-        <div class="chips" role="group" aria-label="Kategorie für Top 5">
-          <button class="chip ${!topCat ? "active" : ""}" aria-pressed="${!topCat}" data-act="top-cat" data-cat="">Alle</button>
-          ${cats.map((c) => `<button class="chip ${topCat === c.slug ? "active" : ""}" aria-pressed="${topCat === c.slug}" data-act="top-cat" data-cat="${c.slug}">${esc(c.name)}</button>`).join("")}
-        </div>
-        <div class="stack" style="margin-top:12px">${top.map((s, i) => BC.studioCard(s, { rank: i + 1 })).join("")}</div>
-      </section>
+      ${BC.pageHead(esc(city.name), { search: `#/s/${citySlug}/k/alle`, plus: `#/s/${citySlug}/pakete/eigenes`, plusLabel: "Eigenes Paket erstellen" })}
+      <div class="slot-days" role="group" aria-label="Kategorie">
+        <button class="chip slot-day ${!topCat ? "active" : ""}" aria-pressed="${!topCat}" data-act="top-cat" data-cat=""><span class="d1">Alle</span><span class="d2">Top 5</span></button>
+        ${cats.map((c) => `<button class="chip slot-day ${topCat === c.slug ? "active" : ""}" aria-pressed="${topCat === c.slug}" data-act="top-cat" data-cat="${c.slug}"><span class="d1">${esc(c.name.split(" ")[0])}</span><span class="d2">${BC.studios(citySlug, { category: c.slug }).length} Studios</span></button>`).join("")}
+      </div>
+      <div class="stack" style="margin-top:14px">${top.map((s, i) => BC.studioCard(s, { rank: i + 1 })).join("")}</div>
+      ${topCat ? `<a class="btn btn-block" style="margin-top:12px" href="#/s/${citySlug}/k/${topCat}">Alle ${esc(BC.category(topCat).name)}-Studios</a>` : ""}
 
       <section class="section">
         <div class="section-head"><h2>Pakete</h2><a href="#/s/${citySlug}/pakete">Alle</a></div>
@@ -95,12 +82,13 @@
   // ---------- Studioliste einer Kategorie
   P.category = (citySlug, catSlug) => {
     const city = BC.city(citySlug);
-    const cat = BC.category(catSlug);
+    const cat = catSlug === "alle" ? { slug: "alle", name: "Alle Studios" } : BC.category(catSlug);
     if (!cat) return P.notFound();
     const fkey = `${citySlug}/${catSlug}`;
     const f = (BC.ui.filters[fkey] = BC.ui.filters[fkey] || {});
-    const all = BC.studios(citySlug, { category: catSlug });
-    const list = BC.studios(citySlug, Object.assign({}, f, { category: catSlug }));
+    const catF = catSlug === "alle" ? undefined : catSlug;
+    const all = BC.studios(citySlug, { category: catF });
+    const list = BC.studios(citySlug, Object.assign({}, f, { category: catF }));
     const districts = [...new Set(all.map((s) => s.district))].sort();
     const langs = [...new Set(all.flatMap((s) => s.languages))].sort();
     const sel = (name, label, options) => `<label class="field"><span class="xs">${label}</span><select data-change="filter" data-key="${fkey}" data-name="${name}">
@@ -109,7 +97,7 @@
       title: `${cat.name} in ${city.name} – ${CFG.appName}`,
       html: `
       <div class="breadcrumb"><a href="#/s/${citySlug}">${esc(city.name)}</a> › ${esc(cat.name)}</div>
-      <h1>${esc(cat.name)}</h1>
+      ${BC.pageHead(esc(cat.name))}
       <div class="chips" role="group" aria-label="Buchungsart" style="margin-top:14px">
         ${[["", "Alle"], ["online", "Online buchbar"], ["request", "Anfrage"], ["manual", "Nur manuell"]].map(([v, t]) =>
           `<button class="chip ${String(f.mode || "") === v ? "active" : ""}" aria-pressed="${String(f.mode || "") === v}" data-act="filter-mode" data-key="${fkey}" data-mode="${v}">${t}</button>`).join("")}
@@ -281,8 +269,8 @@
       title: `Pakete in ${city.name} – ${CFG.appName}`,
       html: `
       <div class="breadcrumb"><a href="#/s/${citySlug}">${esc(city.name)}</a> › Pakete</div>
-      <h1>Pakete</h1>
-      <p class="muted">Paket wählen, Studio pro Leistung aussuchen, fertig.</p>
+      ${BC.pageHead("Pakete", { plus: `#/s/${citySlug}/pakete/eigenes`, plusLabel: "Eigenes Paket erstellen" })}
+      <p class="page-sub">Paket wählen, Studio pro Leistung aussuchen, fertig.</p>
       <div class="grid grid-3 section">
         ${BC.packages(citySlug).map((p) => BC.packageCard(p, citySlug)).join("")}
         <a class="pkg-card card-link" style="--tint:var(--surface)" href="#/s/${citySlug}/pakete/eigenes">

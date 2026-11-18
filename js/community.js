@@ -74,7 +74,7 @@
     return {
       title: `Community ${city.name} – ${CFG.appName}`,
       html: `<div class="breadcrumb"><a href="#/s/${citySlug}">${esc(city.name)}</a> › Community</div>
-      <h1>Community ${esc(city.name)}</h1>
+      ${BC.pageHead("Community")}
       <p class="muted">Frag nach Empfehlungen, teile deine Erfahrungen und hilf anderen Frauen in ${esc(city.name)}. <a href="#/regeln">Regeln</a></p>
       <label class="sr-only" for="c-search">Fragen und Nachrichten durchsuchen</label>
       <input id="c-search" type="search" placeholder="🔎 Fragen & Empfehlungen durchsuchen, z. B. „Balayage“" data-input="community-search" data-city="${citySlug}" style="margin:6px 0 14px">
