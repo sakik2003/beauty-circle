@@ -45,11 +45,6 @@
               <span class="foot"><span class="who"><span class="pic" aria-hidden="true">${BC.icon("pin", 22)}</span><span style="min-width:0"><strong>${S.citySlug === c.slug ? "Deine Stadt" : "Stadt wählen"}</strong><span>${BC.packages(c.slug).length} Pakete verfügbar</span></span></span>${BC.icon("arrow", 22)}</span>
             </a>`).join("")}
         </div>
-      </section>
-
-      <section class="section">
-        <div class="section-head"><h2>Beliebte Pakete</h2><a href="#/s/${city}/pakete">Alle</a></div>
-        <div class="grid grid-3">${BC.packages(city).filter((p) => p.popular).map((p) => BC.packageCard(p, city)).join("")}</div>
       </section>`
     };
   };
@@ -69,12 +64,7 @@
         ${cats.map((c) => `<button class="cat-chip ${topCat === c.slug ? "active" : ""}" aria-pressed="${topCat === c.slug}" data-act="top-cat" data-cat="${c.slug}"><span class="lbl">${BC.studios(citySlug, { category: c.slug }).length} Studios</span><span class="val">${esc(c.name.split(" ")[0])}</span></button>`).join("")}
       </div>
       <div class="stack" style="margin-top:14px">${top.map((s, i) => BC.studioCard(s, { rank: i + 1 })).join("")}</div>
-      ${topCat ? `<a class="btn btn-block" style="margin-top:12px" href="#/s/${citySlug}/k/${topCat}">Alle ${esc(BC.category(topCat).name)}-Studios</a>` : ""}
-
-      <section class="section">
-        <div class="section-head"><h2>Pakete</h2><a href="#/s/${citySlug}/pakete">Alle</a></div>
-        <div class="grid grid-3">${BC.packages(citySlug).slice(0, 3).map((p) => BC.packageCard(p, citySlug)).join("")}</div>
-      </section>`
+      ${topCat ? `<a class="btn btn-block" style="margin-top:12px" href="#/s/${citySlug}/k/${topCat}">Alle ${esc(BC.category(topCat).name)}-Studios</a>` : ""}`
     };
   };
   BC.actions["top-cat"] = (el) => { BC.ui.topCat = el.dataset.cat; BC.render(); };
