@@ -47,18 +47,19 @@
     const S = BC.S();
     const open = S.userPackages.reduce((n, up) => n + up.items.filter((i) => i.status === "manual_open").length, 0);
     const items = [
-      ["entdecken", "Entdecken", "🏠", S.citySlug ? `#/s/${city}` : "#/"],
-      ["pakete", "Pakete", "🎀", `#/s/${city}/pakete`],
-      ["community", "Community", "💬", `#/s/${city}/community`],
-      ["konto", open ? `Konto (${open})` : "Konto", "👤", "#/konto"]
+      ["entdecken", "Entdecken", "home", S.citySlug ? `#/s/${city}` : "#/"],
+      ["pakete", "Pakete", "bag", `#/s/${city}/pakete`],
+      ["community", "Community", "chat", `#/s/${city}/community`],
+      ["konto", "Konto", "user", "#/konto"]
     ];
     const isActive = (k) => k === active || (!active && k === "entdecken" && BC.route() === "#/");
-    document.getElementById("top-nav").innerHTML = items.map(([k, t, , h]) => `<a href="${h}" class="${isActive(k) ? "active" : ""}" ${isActive(k) ? 'aria-current="page"' : ""}>${t}</a>`).join("");
-    document.getElementById("bottom-nav").innerHTML = items.map(([k, t, ic, h]) => `<a href="${h}" class="${isActive(k) ? "active" : ""}" ${isActive(k) ? 'aria-current="page"' : ""}><span class="ic" aria-hidden="true">${ic}</span>${t}</a>`).join("");
+    const cur = (k) => (isActive(k) ? 'class="active" aria-current="page"' : "");
+    document.getElementById("top-nav").innerHTML = items.map(([k, t, , h]) => `<a href="${h}" ${cur(k)}>${t}</a>`).join("");
+    document.getElementById("bottom-nav").innerHTML = items.map(([k, t, ic, h]) =>
+      `<a href="${h}" ${cur(k)}>${BC.icon(ic, 24)}${t}${k === "konto" && open ? `<span class="dot" aria-label="${open} offen">${open}</span>` : ""}</a>`).join("");
     const sel = document.getElementById("city-switch");
-    sel.innerHTML = BC.cities().map((c) => `<option value="${c.slug}" ${c.slug === city ? "selected" : ""}>📍 ${BC.esc(c.name)}</option>`).join("");
-    const name = CFG.appName.split(" ");
-    document.getElementById("logo").innerHTML = name.length > 1 ? `${BC.esc(name[0])} <span>${BC.esc(name.slice(1).join(" "))}</span>` : `<span>${BC.esc(CFG.appName)}</span>`;
+    sel.innerHTML = BC.cities().map((c) => `<option value="${c.slug}" ${c.slug === city ? "selected" : ""}>${BC.esc(c.name)}</option>`).join("");
+    document.getElementById("logo").innerHTML = `<span class="mark" aria-hidden="true"></span>${BC.esc(CFG.appName)}`;
   }
 
   BC.render = () => {
@@ -80,13 +81,11 @@
   function applyTheme() {
     const t = BC.S().theme;
     if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme");
-    const dark = t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.getElementById("theme-toggle").textContent = dark ? "☀️" : "🌙";
   }
-  BC.actions.theme = () => {
-    const S = BC.S();
-    const dark = S.theme ? S.theme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-    S.theme = dark ? "light" : "dark"; BC.save(); applyTheme();
+  // Darstellung: "system" | "light" | "dark" (Auswahl unter Konto)
+  BC.actions.theme = (el) => {
+    const v = el.dataset.theme;
+    BC.S().theme = v === "system" ? null : v; BC.save(); applyTheme(); BC.render();
   };
   BC.changes["city-switch"] = (el) => { BC.S().citySlug = el.value; BC.save(); BC.go(`#/s/${el.value}`); };
 
@@ -94,7 +93,7 @@
   function cookieNotice() {
     const box = document.getElementById("cookie");
     if (BC.S().cookieOk) { box.innerHTML = ""; return; }
-    box.innerHTML = `<div class="card cookie row" role="region" aria-label="Hinweis"><span class="small" style="flex:1;min-width:200px">🍪 Diese Demo verwendet keine Tracking-Cookies. Deine Eingaben werden nur lokal in deinem Browser gespeichert.</span><button class="btn btn-primary btn-sm" data-act="cookie-ok">Verstanden</button></div>`;
+    box.innerHTML = `<div class="card cookie row" role="region" aria-label="Hinweis"><span class="small" style="flex:1;min-width:200px">Keine Tracking-Cookies. Deine Eingaben bleiben nur in diesem Browser.</span><button class="btn btn-primary btn-sm" data-act="cookie-ok">Verstanden</button></div>`;
   }
   BC.actions["cookie-ok"] = () => { BC.S().cookieOk = true; BC.save(); cookieNotice(); };
 

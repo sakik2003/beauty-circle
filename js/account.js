@@ -22,7 +22,7 @@
       if (b.type === "request" && b.status === "pending" && Date.now() - b.createdAt >= CFG.requestConfirmSeconds * 1000) {
         b.status = "confirmed"; b.start = b.requestedTimes[0]; changed = true;
         S.userPackages.forEach((up) => up.items.forEach((it) => { if (it.bookingId === b.id) { it.status = "booked"; it.start = b.start; } }));
-        BC.toast(`✅ ${BC.studioById(b.studioId).name} hat deine Anfrage bestätigt: ${BC.fmtDateTime(b.start)}`);
+        BC.toast(`${BC.studioById(b.studioId).name} hat deine Anfrage bestätigt: ${BC.fmtDateTime(b.start)}`);
       }
     });
     if (changed) BC.save();
@@ -41,9 +41,9 @@
     const today = new Date(); today.setHours(0, 0, 0, 0);
     return {
       title: `Mein Konto – ${CFG.appName}`,
-      html: `<div class="row" style="gap:14px;margin-bottom:14px">${BC.avatar(CFG.demoUser.firstName)}<div><h1 style="margin:0">Hallo ${esc(CFG.demoUser.firstName)} 👋</h1><span class="muted small">Demo-Konto · ${esc(BC.city(BC.currentCity()).name)}</span></div></div>
+      html: `<div class="row" style="gap:14px;margin-bottom:14px">${BC.avatar(CFG.demoUser.firstName)}<div><h1 style="margin:0">Hallo ${esc(CFG.demoUser.firstName)}</h1><span class="muted small">Demo-Konto · ${esc(BC.city(BC.currentCity()).name)}</span></div></div>
       ${nav("konto")}
-      ${openManual ? `<div class="notice notice-manual" style="margin-bottom:14px"><span class="ic">📋</span><div>Du hast noch <strong>${openManual} ${openManual === 1 ? "Termin" : "Termine"}</strong>, die du selbst beim Studio vereinbaren musst. <a href="#/konto/pakete">Zur Checkliste →</a></div></div>` : ""}
+      ${openManual ? `<div class="notice notice-manual" style="margin-bottom:14px"><span class="ic">${BC.icon("phone", 20)}</span><div>Du hast noch <strong>${openManual} ${openManual === 1 ? "Termin" : "Termine"}</strong>, die du selbst beim Studio vereinbaren musst. <a href="#/konto/pakete">Zur Checkliste →</a></div></div>` : ""}
       <div class="grid grid-3">
         <a class="card card-link" href="#/konto/pakete"><span class="stat">${S.userPackages.length}</span><div class="small muted">Pakete</div></a>
         <a class="card card-link" href="#/konto/buchungen"><span class="stat">${upcoming}</span><div class="small muted">Kommende Termine</div></a>
@@ -57,7 +57,7 @@
           const next = BC.parseLocal(r.lastDate + "T12:00") + r.interval * DAY;
           const due = next <= today.getTime() + DAY;
           return `<div class="spread" style="border-bottom:1px solid var(--border);padding-bottom:10px"><div><strong>${esc(r.label)}</strong><div class="xs muted">alle ${r.interval} Tage · nächster Termin: ${BC.fmtDate(next)}</div></div>
-            <div class="row">${due ? `<span class="tag">Jetzt fällig</span>` : ""}<button class="btn btn-sm" data-act="rem-done" data-id="${r.id}">✓ Erledigt</button><button class="btn btn-sm btn-ghost" data-act="rem-del" data-id="${r.id}" aria-label="Erinnerung löschen">🗑️</button></div></div>`;
+            <div class="row">${due ? `<span class="tag">Jetzt fällig</span>` : ""}<button class="btn btn-sm" data-act="rem-done" data-id="${r.id}">Erledigt</button><button class="btn btn-sm btn-ghost" data-act="rem-del" data-id="${r.id}" aria-label="Erinnerung löschen">Löschen</button></div></div>`;
         }).join("")}</div>` : ""}
         <form class="filters" data-submit="reminder" style="align-items:end">
           <label class="field"><span class="xs">Was?</span><input name="label" required maxlength="40" placeholder="Wimpern auffüllen"></label>
@@ -70,6 +70,11 @@
       <section class="section card">
         <h2>Einstellungen</h2>
         <div class="stack">
+          <div><div class="small muted" style="margin-bottom:8px">Darstellung</div>
+            <div class="chips" role="group" aria-label="Darstellung">${[["system", "Automatisch"], ["light", "Hell"], ["dark", "Dunkel"]].map(([v, t]) => {
+              const on = (S.theme || "system") === v;
+              return `<button class="chip ${on ? "active" : ""}" aria-pressed="${on}" data-act="theme" data-theme="${v}">${t}</button>`;
+            }).join("")}</div></div>
           <a href="#/regeln">Community-Regeln</a>
           <a href="#/datenschutz">Datenschutz</a>
           <div><button class="btn" data-act="reset-all" style="color:var(--danger)">Alle Daten löschen</button>
@@ -80,7 +85,7 @@
   };
   BC.submits.reminder = (form) => {
     BC.S().reminders.push({ id: BC.uid(), label: form.elements.label.value.trim(), interval: Number(form.elements.interval.value), lastDate: form.elements.lastDate.value });
-    BC.save(); BC.toast("Erinnerung gespeichert ⏰"); BC.render();
+    BC.save(); BC.toast("Erinnerung gespeichert"); BC.render();
   };
   BC.actions["rem-done"] = (el) => { const r = BC.S().reminders.find((x) => x.id === el.dataset.id); r.lastDate = BC.ymd(Date.now()); BC.save(); BC.toast("Super! Nächste Erinnerung ist gesetzt."); BC.render(); };
   BC.actions["rem-del"] = (el) => { const S = BC.S(); S.reminders = S.reminders.filter((x) => x.id !== el.dataset.id); BC.save(); BC.render(); };
@@ -99,7 +104,7 @@
         const open = up.items.filter((i) => i.status === "manual_open").length;
         return `<a class="card card-link" href="#/konto/pakete/${up.id}"><div class="row" style="gap:12px;margin-bottom:10px"><div style="width:52px">${BC.ph(up.hue, up.icon)}</div>
           <div><h3 style="margin:0">${esc(up.name)}</h3><span class="xs muted">${esc(BC.city(up.citySlug).name)} · erstellt ${BC.ago(up.createdAt)}</span></div></div>
-          ${progressBar(up)}${open ? `<p class="small" style="margin:8px 0 0;color:var(--man)">📋 ${open} noch selbst vereinbaren</p>` : ""}</a>`;
+          ${progressBar(up)}${open ? `<p class="small" style="margin:8px 0 0;color:var(--man)">${open} noch selbst vereinbaren</p>` : ""}</a>`;
       }).join("")}</div>` : BC.empty("🎀", "Noch keine Pakete – entdecke unsere Pakete!", `<a class="btn btn-primary" href="#/s/${BC.currentCity()}/pakete">Pakete ansehen</a>`)}`
     };
   };
@@ -114,8 +119,8 @@
     const row = (it, idx) => {
       const st = BC.studioById(it.studioId), v = BC.service(it.serviceId);
       const head = `<div class="spread"><div class="title"><strong>${esc(it.label)}</strong> · <a href="#/s/${st.citySlug}/studio/${st.slug}">${esc(st.name)}</a><div class="xs muted">${esc(v.name)} · ${BC.euro(v.price)}</div></div>${BC.modeBadge(st.bookingMode)}</div>`;
-      if (it.status === "booked") return `<div class="card check-item">${head}<p class="small" style="margin:0;color:var(--ok)"><strong>✓ Gebucht: ${BC.fmtDateTime(it.start)}</strong></p></div>`;
-      if (it.status === "requested") return `<div class="card check-item">${head}<p class="small" style="margin:0;color:var(--req)"><strong>⏳ Angefragt</strong> – wartet auf Bestätigung des Studios</p><p class="xs muted" style="margin:0">Wunschtermine: ${it.requestedTimes.map(BC.fmtDateTime).join(" / ")}</p></div>`;
+      if (it.status === "booked") return `<div class="card check-item">${head}<p class="small" style="margin:0;color:var(--ok)"><strong>Gebucht: ${BC.fmtDateTime(it.start)}</strong></p></div>`;
+      if (it.status === "requested") return `<div class="card check-item">${head}<p class="small" style="margin:0;color:var(--req)"><strong>Angefragt</strong> – wartet auf Bestätigung des Studios</p><p class="xs muted" style="margin:0">Wunschtermine: ${it.requestedTimes.map(BC.fmtDateTime).join(" / ")}</p></div>`;
       const done = it.status === "manual_done";
       return `<div class="card check-item ${done ? "done" : ""}">
         ${head}
@@ -133,11 +138,11 @@
       title: `${up.name} – Meine Pakete`,
       html: `<div class="breadcrumb"><a href="#/konto/pakete">Meine Pakete</a> › ${esc(up.name)}</div>
       <div class="row" style="gap:14px"><div style="width:60px">${BC.ph(up.hue, up.icon)}</div><div><h1 style="margin:0">${esc(up.name)}</h1><span class="small muted">${esc(BC.city(up.citySlug).name)} · erstellt am ${BC.fmtDate(up.createdAt)}</span></div></div>
-      <div class="card section">${progressBar(up)}${p.done === p.total ? `<p style="margin:10px 0 0"><strong>🎉 Alles erledigt – viel Spaß bei deinen Terminen!</strong></p>` : ""}</div>
-      ${overdue ? `<div class="notice notice-manual" role="alert" style="margin-bottom:14px"><span class="ic">⏰</span><div><strong>Erinnerung:</strong> Du hast seit mehr als ${CFG.manualReminderHours} Stunden noch Termine offen, die du selbst vereinbaren musst.</div></div>` : ""}
+      <div class="card section">${progressBar(up)}${p.done === p.total ? `<p style="margin:10px 0 0"><strong>Alles erledigt. Viel Spaß bei deinen Terminen!</strong></p>` : ""}</div>
+      ${overdue ? `<div class="notice notice-manual" role="alert" style="margin-bottom:14px"><span class="ic">${BC.icon("clock", 20)}</span><div><strong>Erinnerung:</strong> Du hast seit mehr als ${CFG.manualReminderHours} Stunden noch Termine offen, die du selbst vereinbaren musst.</div></div>` : ""}
       <div class="stack">${items.map(({ it, idx }) => row(it, idx)).join("")}</div>
       <div class="row section">
-        <button class="btn btn-ghost btn-sm" data-act="pkg-ff" data-pkg="${up.id}" title="Nur für die Demo">⏩ Demo: ${CFG.manualReminderHours} Std. vorspulen</button>
+        <button class="btn btn-ghost btn-sm" data-act="pkg-ff" data-pkg="${up.id}" title="Nur für die Demo">Demo: ${CFG.manualReminderHours} Std. vorspulen</button>
         <button class="btn btn-ghost btn-sm" data-act="pkg-del" data-pkg="${up.id}" style="color:var(--danger)">Paket löschen</button>
       </div>`
     };
@@ -147,13 +152,13 @@
     const it = findItem(el);
     it.status = el.checked ? "manual_done" : "manual_open";
     BC.save();
-    if (el.checked) BC.toast("Super, abgehakt! ✅");
+    if (el.checked) BC.toast("Abgehakt");
     BC.render();
   };
   BC.changes["pkg-date"] = (el) => {
     const it = findItem(el);
     it.manualDate = el.value;
-    if (el.value && it.status === "manual_open") { it.status = "manual_done"; BC.toast("Termin eingetragen und abgehakt ✅"); }
+    if (el.value && it.status === "manual_open") { it.status = "manual_done"; BC.toast("Termin eingetragen und abgehakt"); }
     BC.save(); BC.render();
   };
   BC.changes["pkg-note"] = (el) => { findItem(el).note = el.value; BC.save(); };
@@ -167,14 +172,14 @@
   P.bookings = () => {
     const S = BC.S();
     const list = S.bookings.slice().sort((a, b) => (b.start || b.createdAt) - (a.start || a.createdAt));
-    const STATUS = { confirmed: ["✅ Bestätigt", "var(--ok)"], pending: ["⏳ Angefragt", "var(--req)"], cancelled: ["✕ Storniert", "var(--muted)"] };
+    const STATUS = { confirmed: ["Bestätigt", "var(--ok)"], pending: ["Angefragt", "var(--req)"], cancelled: ["Storniert", "var(--muted)"] };
     return {
       title: `Meine Buchungen – ${CFG.appName}`,
       html: `<h1>Meine Buchungen</h1>${nav("buchungen")}
       ${list.length ? `<div class="stack">${list.map((b) => {
         const st = BC.studioById(b.studioId), v = BC.service(b.serviceId), s = STATUS[b.status];
         return `<div class="card"><div class="spread"><div><strong><a href="#/s/${st.citySlug}/studio/${st.slug}">${esc(st.name)}</a></strong><div class="small muted">${esc(v.name)} · ${BC.euro(v.price)}</div></div><strong style="color:${s[1]}">${s[0]}</strong></div>
-          <p class="small" style="margin:8px 0 0">${b.status === "pending" ? `Wunschtermine: ${b.requestedTimes.map(BC.fmtDateTime).join(" / ")}` : b.start ? `📅 ${BC.fmtDateTime(b.start)}` : ""}</p>
+          <p class="small" style="margin:8px 0 0">${b.status === "pending" ? `Wunschtermine: ${b.requestedTimes.map(BC.fmtDateTime).join(" / ")}` : b.start ? BC.fmtDateTime(b.start) : ""}</p>
           ${b.status !== "cancelled" && (b.start || 0) > Date.now() || b.status === "pending" ? `<button class="btn btn-ghost btn-sm" data-act="booking-cancel" data-id="${b.id}" style="margin-top:6px">Stornieren</button>` : ""}</div>`;
       }).join("")}</div>` : BC.empty("📅", "Noch keine Buchungen.", `<a class="btn btn-primary" href="#/s/${BC.currentCity()}">Studios entdecken</a>`)}
       <p class="xs muted section">Manuell vereinbarte Termine findest du in der Checkliste unter „Meine Pakete“.</p>`

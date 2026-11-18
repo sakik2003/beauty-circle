@@ -46,7 +46,7 @@
       }
     return out;
   }
-  const conflictBox = (list) => list.length ? `<div class="notice notice-warn" role="alert"><span class="ic">⚠️</span><div><strong>Termine überschneiden sich</strong> (inkl. ${CFG.bufferMinutes} Min. Puffer für den Weg):<ul style="margin:6px 0 0;padding-left:1.1rem">${list.map(([A, B]) => `<li>${esc(A.it.label)} (${BC.fmtDateTime(A.start)}) und ${esc(B.it.label)} (${BC.fmtDateTime(B.start)})</li>`).join("")}</ul></div></div>` : "";
+  const conflictBox = (list) => list.length ? `<div class="notice notice-warn" role="alert"><span class="ic">!</span><div><strong>Termine überschneiden sich</strong> (inkl. ${CFG.bufferMinutes} Min. Puffer für den Weg):<ul style="margin:6px 0 0;padding-left:1.1rem">${list.map(([A, B]) => `<li>${esc(A.it.label)} (${BC.fmtDateTime(A.start)}) und ${esc(B.it.label)} (${BC.fmtDateTime(B.start)})</li>`).join("")}</ul></div></div>` : "";
 
   function validate(step) {
     if (step === 1 && !included().length) return "Bitte wähle mindestens eine Leistung.";
@@ -107,7 +107,7 @@
           <div class="pick selected" style="margin-top:12px;cursor:default">${BC.ph(st.hue, BC.studioIcon(st))}<div class="info"><strong>${esc(st.name)}</strong><span class="xs muted">${esc(st.district)} · ★ ${BC.ratingOf(st).rating.toFixed(1).replace(".", ",")}</span></div>
             <button class="btn btn-sm" data-act="wiz-open" data-i="${i}">Ändern</button></div>
           <label class="field" style="margin-top:10px"><span class="xs">Leistung</span><select data-change="wiz-service" data-i="${i}">${opts.map((v) => `<option value="${v.id}" ${v.id === it.serviceId ? "selected" : ""}>${esc(v.name)} – ${BC.euro(v.price)} · ${v.durationMin} Min.</option>`).join("")}</select></label>
-          ${st.bookingMode === "manual" ? `<p class="xs" style="margin:8px 0 0;color:var(--man)">📞 Dieses Studio ist nicht online buchbar – du bekommst im nächsten Schritt die Kontaktdaten.</p>` : ""}
+          ${st.bookingMode === "manual" ? `<p class="xs" style="margin:8px 0 0;color:var(--man)">Nicht online buchbar – im nächsten Schritt bekommst du die Kontaktdaten.</p>` : ""}
         </div>`;
       }
       let list = BC.studios(W.citySlug, { category: it.categorySlug, mode: W.onlyOnline ? "online" : undefined, sort: W.sort === "online" ? "online" : "score" });
@@ -136,7 +136,7 @@
       let body = "";
       if (st.bookingMode === "online") {
         body = `<p class="small muted">Wähle einen freien Termin – er wird beim Speichern fest gebucht.</p>${BC.slotPicker(st, "wiz-" + i, "wiz-slot", it.slotId, `data-i="${i}"`)}
-          ${it.start ? `<p class="small" style="margin-top:10px;color:var(--ok)"><strong>✓ ${BC.fmtDateTime(it.start)}</strong></p>` : ""}`;
+          ${it.start ? `<p class="small" style="margin-top:10px;color:var(--ok)"><strong>${BC.fmtDateTime(it.start)}</strong></p>` : ""}`;
       } else if (st.bookingMode === "request") {
         body = `<p class="small muted">Gib bis zu 3 Wunschtermine an – das Studio bestätigt einen davon.</p>
           <div class="grid grid-3">${[0, 1, 2].map((j) => `<label class="field"><span class="xs">Wunschtermin ${j + 1}${j === 0 ? " *" : ""}</span><input type="datetime-local" step="1800" min="${min}" value="${esc(it.times[j])}" data-change="wiz-time" data-i="${i}" data-j="${j}"></label>`).join("")}</div>`;
@@ -157,7 +157,7 @@
     const timed = rows.filter((r) => r.start).sort((a, b) => a.start - b.start);
     const open = rows.filter((r) => !r.start);
     return `${c.length ? conflictBox(c) + `<div class="row" style="margin:10px 0"><button class="btn btn-soft" data-act="wiz-goto" data-step="3">Termine anpassen</button><span class="small muted">oder trotzdem weiter</span></div>`
-        : `<div class="notice notice-ok"><span class="ic">✅</span><div><strong>Alles passt!</strong> Keine Überschneidungen – zwischen den Terminen ist genug Zeit für den Weg.</div></div>`}
+        : `<div class="notice notice-ok"><span class="ic">${BC.icon("check", 20)}</span><div><strong>Alles passt!</strong> Keine Überschneidungen – zwischen den Terminen ist genug Zeit für den Weg.</div></div>`}
       <div class="card section"><h2>Dein Zeitplan</h2>
         <ul class="timeline">${timed.map((r) => `<li class="${conflictIdx.has(r.it) ? "conflict" : ""}"><span class="time">${BC.fmtDate(r.start)}<br>${BC.fmtTime(r.start)}–${BC.fmtTime(r.start + r.v.durationMin * 60000)}</span>
           <span><strong>${esc(r.it.label)}</strong> · ${esc(r.st.name)}<br>${BC.modeBadge(r.st.bookingMode)} ${r.st.bookingMode === "request" ? `<span class="xs muted">Wunschtermin 1 – wartet auf Bestätigung</span>` : ""}</span></li>`).join("")}
@@ -172,16 +172,16 @@
     included().forEach((it) => groups[studioOf(it).bookingMode].push(it));
     const line = (it, extra) => { const st = studioOf(it), v = serviceOf(it); return `<div class="sum-line"><span><strong>${esc(it.label)}</strong> · ${esc(st.name)}<br><span class="xs muted">${esc(v.name)}${extra ? " · " + extra : ""}</span></span><strong>${BC.euro(v.price)}</strong></div>`; };
     return `<div class="card">
-      ${groups.online.length ? `<div class="summary-group"><h3>✅ Wird gebucht</h3>${groups.online.map((it) => line(it, BC.fmtDateTime(it.start))).join("")}</div>` : ""}
-      ${groups.request.length ? `<div class="summary-group"><h3>⏳ Wird angefragt</h3>${groups.request.map((it) => line(it, "Wunsch: " + it.times.filter(Boolean).map((t) => BC.fmtDateTime(BC.parseLocal(t))).join(" / "))).join("")}</div>` : ""}
-      ${groups.manual.length ? `<div class="summary-group"><h3>📋 Noch zu erledigen (selbst kontaktieren)</h3>${groups.manual.map((it) => line(it, "Kontaktdaten findest du in deiner Checkliste")).join("")}
+      ${groups.online.length ? `<div class="summary-group"><h3>Wird gebucht</h3>${groups.online.map((it) => line(it, BC.fmtDateTime(it.start))).join("")}</div>` : ""}
+      ${groups.request.length ? `<div class="summary-group"><h3>Wird angefragt</h3>${groups.request.map((it) => line(it, "Wunsch: " + it.times.filter(Boolean).map((t) => BC.fmtDateTime(BC.parseLocal(t))).join(" / "))).join("")}</div>` : ""}
+      ${groups.manual.length ? `<div class="summary-group"><h3>Selbst vereinbaren</h3>${groups.manual.map((it) => line(it, "Kontaktdaten findest du in deiner Checkliste")).join("")}
         <p class="xs muted">Diese Studios kannst du nicht über ${esc(CFG.appName)} buchen. Nach dem Speichern bekommst du eine Checkliste mit allen Kontaktdaten zum Abhaken.</p></div>` : ""}
       <hr>
       <div class="sum-line"><span>Summe aller Leistungen</span><span>${BC.euro(p.sum)}</span></div>
       ${p.discount ? `<div class="sum-line" style="color:var(--ok)"><span>Paket-Rabatt ${W.pkg.discountPercent} % (nur online gebuchte Leistungen)</span><span>−${BC.euro(p.discount)}</span></div>` : ""}
       <div class="sum-line sum-total"><span>Gesamt ca.</span><span>${BC.euro(p.total)}</span></div>
       ${groups.manual.length || groups.request.length ? `<p class="xs muted">Preise bei manuell buchbaren Studios und Anfragen können abweichen. Bezahlt wird direkt im Studio.</p>` : `<p class="xs muted">Bezahlt wird direkt im Studio.</p>`}
-      ${conflicts().length ? `<div class="notice notice-warn small" style="margin-top:10px"><span class="ic">⚠️</span><div>Achtung: Einige Termine überschneiden sich.</div></div>` : ""}
+      ${conflicts().length ? `<div class="notice notice-warn small" style="margin-top:10px"><span class="ic">!</span><div>Achtung: Einige Termine überschneiden sich.</div></div>` : ""}
     </div>`;
   }
 
@@ -195,7 +195,7 @@
     const body = [null, step1, step2, step3, step4, step5][W.step]();
     const next = W.step < 5
       ? `<button class="btn btn-primary" data-act="wiz-next">Weiter: ${STEPS[W.step]} →</button>`
-      : `<button class="btn btn-primary" data-act="wiz-save">💾 Paket speichern</button>`;
+      : `<button class="btn btn-primary" data-act="wiz-save">Paket speichern</button>`;
     return {
       title: `${name} – Pakete in ${city.name}`,
       html: `
@@ -283,7 +283,7 @@
     S.userPackages.unshift(up);
     BC.save();
     W = null;
-    BC.toast("Paket gespeichert! 🎉 Hier ist deine Checkliste.");
+    BC.toast("Paket gespeichert. Hier ist deine Checkliste.");
     BC.go(`#/konto/pakete/${up.id}`);
   };
 })();
