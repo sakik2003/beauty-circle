@@ -40,7 +40,7 @@
       <section class="section">
         ${BC.pageHead("Städte")}
         <div class="stack">
-          ${BC.cities().map((c, i) => `<a class="studio-card card-link" style="--tint:${["var(--sky)", "var(--pink)", "var(--lav)"][i % 3]};text-decoration:none" href="#/s/${c.slug}">
+          ${BC.cities().map((c, i) => `<a class="studio-card card-link" style="--tint:${["var(--sky)", "var(--pink)", "var(--yellow)"][i % 3]};text-decoration:none" href="#/s/${c.slug}">
               <span style="display:block;padding:14px 16px 12px"><h3 style="margin:0 0 2px;font-size:1.1rem">${esc(c.name)}</h3><span class="meta">${BC.studios(c.slug).length} Studios · ${(CFG.communitySize[c.slug] || 500).toLocaleString("de-DE")} Frauen</span></span>
               <span class="foot"><span class="who"><span class="pic" aria-hidden="true">${BC.icon("pin", 22)}</span><span style="min-width:0"><strong>${S.citySlug === c.slug ? "Deine Stadt" : "Stadt wählen"}</strong><span>${BC.packages(c.slug).length} Pakete verfügbar</span></span></span>${BC.icon("arrow", 22)}</span>
             </a>`).join("")}
@@ -65,8 +65,8 @@
       html: `
       ${BC.pageHead(esc(city.name), { search: `#/s/${citySlug}/k/alle`, plus: `#/s/${citySlug}/pakete/eigenes`, plusLabel: "Eigenes Paket erstellen" })}
       <div class="slot-days" role="group" aria-label="Kategorie">
-        <button class="chip slot-day ${!topCat ? "active" : ""}" aria-pressed="${!topCat}" data-act="top-cat" data-cat=""><span class="d1">Alle</span><span class="d2">Top 5</span></button>
-        ${cats.map((c) => `<button class="chip slot-day ${topCat === c.slug ? "active" : ""}" aria-pressed="${topCat === c.slug}" data-act="top-cat" data-cat="${c.slug}"><span class="d1">${esc(c.name.split(" ")[0])}</span><span class="d2">${BC.studios(citySlug, { category: c.slug }).length} Studios</span></button>`).join("")}
+        <button class="cat-chip ${!topCat ? "active" : ""}" aria-pressed="${!topCat}" data-act="top-cat" data-cat=""><span class="lbl">Top 5</span><span class="val">Alle</span></button>
+        ${cats.map((c) => `<button class="cat-chip ${topCat === c.slug ? "active" : ""}" aria-pressed="${topCat === c.slug}" data-act="top-cat" data-cat="${c.slug}"><span class="lbl">${BC.studios(citySlug, { category: c.slug }).length} Studios</span><span class="val">${esc(c.name.split(" ")[0])}</span></button>`).join("")}
       </div>
       <div class="stack" style="margin-top:14px">${top.map((s, i) => BC.studioCard(s, { rank: i + 1 })).join("")}</div>
       ${topCat ? `<a class="btn btn-block" style="margin-top:12px" href="#/s/${citySlug}/k/${topCat}">Alle ${esc(BC.category(topCat).name)}-Studios</a>` : ""}

@@ -35,9 +35,9 @@
   BC.tint = (h) => {
     h = ((h % 360) + 360) % 360;
     if (h >= 300 || h < 12) return "var(--pink)";
-    if (h >= 220) return "var(--lav)";
+    if (h >= 220) return "var(--yellow)";
     if (h >= 150) return "var(--sky)";
-    return "var(--sand)";
+    return "var(--green)";
   };
 
   // ---------- Kennzeichen der Buchungsart
@@ -174,8 +174,9 @@
       <div class="slot-days" role="group" aria-label="Tag wählen">${days.map((d) => {
         const dt = new Date(BC.parseLocal(d + "T12:00"));
         return `<button class="chip slot-day ${d === day ? "active" : ""}" data-act="slot-day" data-key="${esc(key)}" data-day="${d}" aria-pressed="${d === day}">
-          <span class="d1">${dt.getDate()}. ${dt.toLocaleDateString("de-DE", { month: "short" }).replace(".", "")}</span><span class="d2">${BC.DAYS[dt.getDay()].slice(0, 2)}</span></button>`;
+          <span class="d2">${BC.DAYS[dt.getDay()].slice(0, 2)}</span><span class="d1" aria-label="${BC.fmtDateLong(dt)}">${dt.getDate()}</span></button>`;
       }).join("")}</div>
+      <div class="xs muted" style="margin-top:4px">${BC.fmtDateLong(BC.parseLocal(day + "T12:00"))}</div>
       <div class="slot-times" role="group" aria-label="Uhrzeit wählen">${times.map((s) =>
         `<button class="chip ${s.id === selectedId ? "active" : ""}" aria-pressed="${s.id === selectedId}" data-act="${act}" data-slot="${s.id}" data-start="${s.start}" ${extraAttr || ""}>${BC.fmtTime(s.start)}</button>`
       ).join("")}</div>

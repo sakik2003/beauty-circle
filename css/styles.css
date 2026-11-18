@@ -5,42 +5,41 @@
    Farben hier ändern – alles andere leitet sich davon ab.
    ========================================================= */
 :root {
-  /* Palette */
-  --bg: #F6F4F0;        /* Off-White – Seitenhintergrund */
-  --surface: #FFFFFF;   /* weiße Flächen */
-  --ink: #1D1C1B;       /* Schrift & Buttons */
-  --muted: #6E6A62;     /* Nebentext */
-  --line: #E7E2D7;      /* Linien */
-  --sand: #D8D1AF;      /* Auswahl, Akzent */
-  --pink: #F6D0EF;
-  --lav: #C1C8FF;
-  --sky: #C3E4EE;
-  --on-tint: #1D1C1B;   /* Schrift auf Pastell */
-  --btn: #1D1C1B; --btn-ink: #F6F4F0;
+  /* Palette (Vorlage „Lexend“): Weiß, helle Pastell-Karten, kräftige Akzente, Schwarz */
+  --bg: #FFFFFF;        /* Seitenhintergrund */
+  --surface: #F5F3F0;   /* graue Flächen (Listen, Panels) */
+  --ink: #111111;       /* Schrift & Buttons */
+  --muted: #8C8A86;     /* Nebentext */
+  --line: #ECEAE6;      /* Linien, Rahmen */
+  /* Kartenflächen (hell) */
+  --pink: #FFCDEE; --yellow: #FFE58A; --sky: #C3F0FD; --green: #CDF6B7;
+  /* Akzente (kräftig) – Häkchen, Punkte, Auswahl */
+  --pink-strong: #FF88D3; --yellow-strong: #FFCD20; --sky-strong: #84E2FA; --green-strong: #A6F686;
+  --on-tint: #111111; --btn: #111111; --btn-ink: #FFFFFF;
   /* Zustände (nur für Text) */
-  --ok: #2E7450; --req: #4650B0; --man: #8E3F7F; --danger: #B3261E; --star: #8C7B33;
+  --ok: #2E7D32; --req: #8A6100; --man: #C2187F; --danger: #D32F2F; --star: #111111;
   /* Aliase für ältere Stellen */
   --text: var(--ink); --border: var(--line);
   /* Schrift */
-  --font: "Sen", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
   /* Form */
-  --r-lg: 18px; --r: 14px; --r-sm: 12px;
+  --r-lg: 26px; --r: 18px; --r-sm: 14px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #151413; --surface: #201E1C; --ink: #F6F4F0; --muted: #A8A399; --line: #33302B;
-    --sand: #4B4633; --pink: #4A3045; --lav: #33385E; --sky: #26434B; --on-tint: #F6F4F0;
-    --btn: #F6F4F0; --btn-ink: #1D1C1B;
-    --ok: #8ED3AC; --req: #B9C0FF; --man: #F2B9E7; --danger: #FF8F85; --star: #E3D28A;
+    --bg: #121212; --surface: #1E1D1C; --ink: #F5F5F5; --muted: #9A9893; --line: #2D2C2A;
+    --pink: #4A2840; --yellow: #463B14; --sky: #1B4250; --green: #284221; --on-tint: #F5F5F5;
+    --btn: #F5F5F5; --btn-ink: #111111;
+    --ok: #8BE08F; --req: #FFD966; --man: #FF9EDC; --danger: #FF8A80; --star: #F5F5F5;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #151413; --surface: #201E1C; --ink: #F6F4F0; --muted: #A8A399; --line: #33302B;
-  --sand: #4B4633; --pink: #4A3045; --lav: #33385E; --sky: #26434B; --on-tint: #F6F4F0;
-  --btn: #F6F4F0; --btn-ink: #1D1C1B;
-  --ok: #8ED3AC; --req: #B9C0FF; --man: #F2B9E7; --danger: #FF8F85; --star: #E3D28A;
+  --bg: #121212; --surface: #1E1D1C; --ink: #F5F5F5; --muted: #9A9893; --line: #2D2C2A;
+  --pink: #4A2840; --yellow: #463B14; --sky: #1B4250; --green: #284221; --on-tint: #F5F5F5;
+  --btn: #F5F5F5; --btn-ink: #111111;
+  --ok: #8BE08F; --req: #FFD966; --man: #FF9EDC; --danger: #FF8A80; --star: #F5F5F5;
   color-scheme: dark;
 }
 
@@ -150,7 +149,7 @@ label.field > span { display: block; margin-bottom: 6px; color: var(--muted); }
 .pkg-card .items { font-size: .85rem; opacity: .75; }
 .pkg-card .go { margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: .88rem; }
 .tag { display: inline-flex; align-items: center; font-size: .72rem; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--ink); color: var(--bg); letter-spacing: .02em; }
-.tag-gold { background: var(--sand); color: var(--on-tint); }
+.tag-gold { background: var(--green); color: var(--on-tint); }
 .rating { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: .85rem; white-space: nowrap; }
 .rating .muted { font-weight: 400; color: inherit; opacity: .7; }
 .price-level { font-size: .85rem; letter-spacing: 1px; opacity: .55; }
@@ -159,14 +158,14 @@ label.field > span { display: block; margin-bottom: 6px; color: var(--muted); }
 /* ---------- Kennzeichen der Buchungsart */
 .mode-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border-radius: 999px; font-size: .76rem; font-weight: 700; white-space: nowrap; width: fit-content; color: var(--on-tint); }
 .mode-online { background: var(--sky); }
-.mode-request { background: var(--lav); }
+.mode-request { background: var(--yellow); }
 .mode-manual { background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
 .studio-card .mode-online, .pkg-card .mode-online { background: color-mix(in srgb, var(--surface) 65%, transparent); }
 .studio-card .mode-request { background: color-mix(in srgb, var(--surface) 65%, transparent); }
 .notice { border-radius: var(--r); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; font-size: .92rem; }
 .notice .ic { display: grid; place-items: center; }
 .notice-manual { background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--ink); }
-.notice-warn { background: var(--lav); color: var(--on-tint); }
+.notice-warn { background: var(--yellow); color: var(--on-tint); }
 .notice-ok { background: var(--sky); color: var(--on-tint); }
 .notice-info { background: var(--pink); color: var(--on-tint); }
 
@@ -193,7 +192,7 @@ details.collapse[open] > summary::after { transform: rotate(90deg); }
 .hero p { color: var(--muted); max-width: 440px; font-size: 1.05rem; }
 .hero .sticker { position: absolute; right: 0; top: 6px; width: clamp(76px, 22vw, 130px); height: auto; }
 .hero .sticker .petal { fill: var(--surface); }
-.hero .sticker .heart { fill: var(--lav); }
+.hero .sticker .heart { fill: var(--yellow); }
 .city-card { background: var(--tint); color: var(--on-tint); border-radius: var(--r-lg); padding: 20px; text-decoration: none; display: flex; justify-content: space-between; align-items: flex-end; min-height: 120px; }
 .city-card h3 { font-size: 1.5rem; margin: 0; }
 .steps3 { display: grid; gap: 10px; }
@@ -270,15 +269,15 @@ details.collapse[open] > summary::after { transform: rotate(90deg); }
 .channel-list .ic { width: 44px; height: 44px; border-radius: 14px; background: var(--tint, var(--pink)); color: var(--on-tint); display: grid; place-items: center; font-size: 1.15rem; flex-shrink: 0; }
 .msg { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .msg:last-child { border-bottom: none; }
-.avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: var(--on-tint); flex-shrink: 0; background: var(--tint, var(--lav)); }
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: var(--on-tint); flex-shrink: 0; background: var(--tint, var(--yellow)); }
 .msg-body { flex: 1; min-width: 0; }
 .msg-head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
 .msg-text { margin: 4px 0 6px; overflow-wrap: anywhere; }
 .msg-img { max-height: 240px; border-radius: var(--r-sm); margin: 6px 0; object-fit: cover; }
 .msg-actions { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
 .react { border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 2px 10px; font: inherit; font-size: .8rem; cursor: pointer; min-height: 30px; color: var(--ink); }
-.react[aria-pressed="true"] { background: var(--sand); border-color: var(--sand); color: var(--on-tint); }
-.mention { background: var(--lav); color: var(--on-tint); padding: 1px 7px; border-radius: 8px; font-weight: 700; text-decoration: none; }
+.react[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: var(--on-tint); }
+.mention { background: var(--yellow); color: var(--on-tint); padding: 1px 7px; border-radius: 8px; font-weight: 700; text-decoration: none; }
 .mini-studio { display: flex; gap: 10px; align-items: center; border-radius: var(--r); padding: 10px 12px; margin: 8px 0; text-decoration: none; max-width: 440px; background: var(--bg); }
 .mini-studio .ph { width: 36px; min-width: 36px; height: 36px; font-size: 1rem; border-radius: 10px; }
 .q-badge { font-size: .7rem; font-weight: 800; background: var(--pink); color: var(--on-tint); padding: 2px 8px; border-radius: 99px; }
@@ -319,7 +318,7 @@ details.collapse[open] > summary::after { transform: rotate(90deg); }
    ========================================================= */
 /* Datums- und Uhrzeit-Chips: weiße Rechtecke, Auswahl in Sand */
 .slot-day, .slot-times .chip { border-radius: 12px; border-color: transparent; background: var(--surface); color: var(--ink); }
-.slot-day.active, .slot-times .chip.active, .slot-day[aria-pressed="true"], .slot-times .chip[aria-pressed="true"] { background: var(--sand); border-color: var(--sand); color: var(--on-tint); }
+.slot-day.active, .slot-times .chip.active, .slot-day[aria-pressed="true"], .slot-times .chip[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: var(--on-tint); }
 
 /* Untere Leiste: nur Icons, weiß */
 .bottom-nav { background: var(--surface); border-top: none; box-shadow: 0 -1px 0 var(--line); padding-top: 4px; }
@@ -354,7 +353,86 @@ details.collapse[open] > summary::after { transform: rotate(90deg); }
 .onboard h1 { font-size: clamp(2rem, 8vw, 2.6rem); font-weight: 700; max-width: 12ch; margin-bottom: 10px; }
 .onboard p { color: var(--ink); opacity: .8; max-width: 30ch; margin-bottom: 22px; }
 .onboard .btn { width: 100%; max-width: 420px; }
-.illu .c-lav { fill: var(--lav); } .illu .c-pink { fill: var(--pink); } .illu .c-sky { fill: var(--sky); }
-.illu .c-sand { fill: #D8D1AF; } .illu .c-ink { fill: #1D1C1B; } .illu .c-white { fill: #F6F4F0; }
-.illu .s-ink { stroke: #1D1C1B; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.illu .c-lav { fill: var(--green); } .illu .c-pink { fill: var(--pink); } .illu .c-sky { fill: var(--sky); }
+.illu .c-sand { fill: var(--yellow-strong); } .illu .c-ink { fill: #111111; } .illu .c-white { fill: #FFFFFF; }
+.illu .s-ink { stroke: #111111; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .card .slot-day:not(.active), .card .slot-times .chip:not(.active) { background: var(--bg); }
+
+/* =========================================================
+   Stil der Vorlage „Lexend“ (Aufbau bleibt gleich)
+   ========================================================= */
+body { font-weight: 400; }
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.015em; }
+.page-head h1 { font-size: 1.8rem; font-weight: 600; }
+.onboard h1 { font-weight: 600; }
+strong, b { font-weight: 600; }
+
+/* Flächen: graue Panels auf Weiß, Karten mit großen Radien */
+.card { background: var(--surface); border-radius: var(--r-lg); }
+.card .contact-card, .contact-card { background: var(--bg); border-radius: var(--r); }
+.studio-card, .pkg-card, .city-card, .studio-hero { border-radius: var(--r-lg); }
+.studio-card .foot { border-top-color: color-mix(in srgb, var(--on-tint) 8%, transparent); }
+.studio-card .who .pic, .channel-list .ic, .mini-studio .ph, .pick .ph { border-radius: 50%; }
+.studio-card .who .pic { background: color-mix(in srgb, var(--bg) 75%, transparent); }
+.logo .mark::after { background: var(--pink-strong); }
+
+/* Kennzeichen in den kräftigen Akzentfarben */
+.mode-online, .studio-card .mode-online, .pkg-card .mode-online { background: var(--green-strong); color: #111; }
+.mode-request, .studio-card .mode-request { background: var(--yellow-strong); color: #111; }
+.mode-manual { background: var(--bg); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+
+/* Buttons: großer schwarzer Button, kleine schwarze Pills */
+.btn { border-radius: 18px; font-weight: 500; }
+.btn-primary { background: var(--btn); border-color: var(--btn); color: var(--btn-ink); }
+.btn:not(.btn-primary):not(.btn-wa) { border: 1.5px solid var(--line); background: var(--bg); }
+.btn-sm { border-radius: 999px; }
+.btn-wa { border-radius: 18px; }
+.square-btn { border-radius: 50%; }
+.round-btn { background: var(--surface); }
+
+/* Filter-Chips: grau, aktiv schwarz (wie „month“) */
+.chip { border: none; background: var(--surface); font-weight: 500; }
+.chip.active, .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* Info-Kästchen wie „Gender / Female“ */
+.cat-chip { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 18px; min-width: 96px; border: 1.5px solid var(--line); border-radius: 20px; background: var(--bg); font: inherit; color: var(--ink); cursor: pointer; }
+.cat-chip .lbl { font-size: .76rem; color: var(--muted); }
+.cat-chip .val { font-weight: 500; font-size: 1rem; }
+.cat-chip.active { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.cat-chip.active .lbl { color: inherit; opacity: .7; }
+
+/* Datums-Kreise wie im Kalender der Vorlage */
+.slot-days { gap: 6px; }
+.slot-day, .card .slot-day:not(.active) { background: transparent; border: none; min-width: 44px; padding: 0; gap: 6px; box-shadow: none; }
+.slot-day.active, .slot-day[aria-pressed="true"] { background: transparent; }
+.slot-day .d2 { order: -1; font-size: .74rem; color: var(--muted); opacity: 1; font-weight: 400; }
+.slot-day .d1 { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); font-weight: 500; font-size: .92rem; }
+.card .slot-day .d1 { background: var(--bg); }
+.slot-day.active .d1 { background: var(--pink-strong); color: #111; }
+.slot-day.active .d2 { color: var(--ink); font-weight: 600; }
+.slot-times .chip, .card .slot-times .chip:not(.active) { border-radius: 999px; background: var(--bg); border: 1.5px solid var(--line); }
+.slot-times .chip.active { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+/* Runde Häkchen wie in „Today's diet“ */
+input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--ink) 25%, transparent); background: var(--bg); display: inline-grid; place-items: center; cursor: pointer; margin: 0; }
+input[type="checkbox"]:checked { background: var(--yellow-strong); border-color: var(--yellow-strong); }
+input[type="checkbox"]:checked::after { content: ""; width: 10px; height: 5px; border-left: 2px solid #111; border-bottom: 2px solid #111; transform: translateY(-1px) rotate(-45deg); }
+input[type="checkbox"]:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Fortschritt, Schritte, Nummern in Akzentfarben */
+.progress { background: var(--bg); }
+.progress > div { background: var(--green-strong); }
+.wizard-steps .done .bar { background: var(--green-strong); }
+.wizard-steps .current .bar { background: var(--ink); }
+.wiz-num { background: var(--pink-strong); color: #111; }
+.rank { background: var(--bg); color: var(--ink); }
+.pick { background: var(--bg); }
+.pick.selected { border-color: var(--ink); }
+.react[aria-pressed="true"] { background: var(--pink-strong); border-color: var(--pink-strong); color: #111; }
+.q-badge { background: var(--yellow-strong); color: #111; }
+.mention { background: var(--sky); }
+.best { background: var(--green); }
+.bottom-nav .dot { background: var(--pink-strong); color: #111; }
+.notice-ok { background: var(--green); }
+.notice-warn { background: var(--yellow); }
+.notice-info { background: var(--pink); }
